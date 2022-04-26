@@ -1,6 +1,6 @@
 # Проект «Киноман»
 
-* Студент: [Лев Невиницин](https://up.htmlacademy.ru/ecmascript/17/user/1252355).
+* Студент: [Лев Невиницин](https://htmlacademy.ru/profile/id1252355).
 * Наставник: [Артём Рудов](https://up.htmlacademy.ru/ecmascript/17/user/345377).
 
 ---
