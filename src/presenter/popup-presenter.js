@@ -1,11 +1,11 @@
+import { PopupView } from 'view';
 import {
-  PopupView,
   PopupCommentListView,
   PopupCommentItemView,
   PopupTopContainerView,
   PopupBottomContainerView,
   PopupNewCommentView,
-} from 'popupView';
+} from 'popup';
 
 import {render} from '../render.js';
 
