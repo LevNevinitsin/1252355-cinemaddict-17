@@ -22,5 +22,11 @@ module.exports = {
         use: ['babel-loader']
       }
     ]
+  },
+  resolve: {
+    alias: {
+      view: path.resolve(__dirname, 'src/view'),
+      popupView: path.resolve(__dirname, 'src/view/popup')
+    }
   }
 };

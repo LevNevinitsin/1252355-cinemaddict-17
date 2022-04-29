@@ -1,5 +1,4 @@
-import MainContentView from '../view/main-content-view.js';
-import FilmListView from '../view/film-list-view.js';
+import { MainContentView, FilmListView } from 'view';
 import {render} from '../render.js';
 
 export default class ContentPresenter {

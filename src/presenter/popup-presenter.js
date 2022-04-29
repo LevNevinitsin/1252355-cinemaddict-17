@@ -1,10 +1,13 @@
-import PopupView                from '../view/popup/popup-view.js';
-import PopupCommentListView     from '../view/popup/popup-comment-list-view.js';
-import PopupCommentItemView     from '../view/popup/popup-comment-item-view.js';
-import PopupTopContainerView    from '../view/popup/popup-top-container-view.js';
-import PopupBottomContainerView from '../view/popup/popup-bottom-container-view.js';
-import PopupNewCommentView      from '../view/popup/popup-new-comment-view.js';
-import {render}                 from '../render.js';
+import {
+  PopupView,
+  PopupCommentListView,
+  PopupCommentItemView,
+  PopupTopContainerView,
+  PopupBottomContainerView,
+  PopupNewCommentView,
+} from 'popupView';
+
+import {render} from '../render.js';
 
 export default class PopupPresenter {
   popupComponent                = new PopupView();

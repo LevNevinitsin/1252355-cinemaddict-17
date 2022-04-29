@@ -1,9 +1,6 @@
-import UserRankView from './view/user-rank-view.js';
-import FilmsCountView from './view/films-count-view.js';
-import FilterView from './view/filter-view.js';
+import { UserRankView, FilterView, SortView, FilmsCountView } from 'view';
 import ContentPresenter from './presenter/content-presenter.js';
 import PopupPresenter from './presenter/popup-presenter.js';
-import SortView from './view/sort-view.js';
 import {render} from './render.js';
 
 const siteHeaderElement = document.querySelector('.header');
