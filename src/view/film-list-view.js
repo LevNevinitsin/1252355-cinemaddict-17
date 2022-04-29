@@ -25,7 +25,7 @@ const createFilmItemsTemplate = (filmsCount) => {
     </article>`
   );
 
-  for (let i = 0; i< filmsCount; i++) {
+  for (let i = 0; i < filmsCount; i++) {
     filmItemsTemplate += filmItemTemplate;
   }
 
