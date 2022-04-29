@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import { createElement } from 'utils';
 
 const createMainContentTemplate = () => '<section class="films"></section>';
 

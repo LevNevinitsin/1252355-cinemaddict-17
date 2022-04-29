@@ -1,4 +1,4 @@
-import {createElement} from '../../render.js';
+import { createElement } from 'utils';
 
 const createPopupTopContainerTemplate = () => (
   `<div class="film-details__top-container">

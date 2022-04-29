@@ -1,4 +1,4 @@
-import {createElement} from '../../render.js';
+import { createElement } from 'utils';
 
 const createPopupCommentListTemplate = () => '<ul class="film-details__comments-list"></ul>';
 

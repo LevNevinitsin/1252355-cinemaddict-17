@@ -7,7 +7,7 @@ import {
   PopupNewCommentView,
 } from 'popup';
 
-import {render} from '../render.js';
+import { render } from 'utils';
 
 export default class PopupPresenter {
   popupComponent = new PopupView();

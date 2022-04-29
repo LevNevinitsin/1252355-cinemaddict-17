@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import { createElement } from 'utils';
 
 const createUserRankTemplate = () => (
   `<section class="header__profile profile">

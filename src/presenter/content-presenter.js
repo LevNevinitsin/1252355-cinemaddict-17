@@ -1,5 +1,5 @@
 import { FilterView, SortView, MainContentView, FilmListView, ShowMoreButtonView } from 'view';
-import {render} from '../render.js';
+import { render } from 'utils';
 
 const FILMS_COUNT = 5;
 const RATING_FILMS = 2;
