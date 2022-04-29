@@ -17,10 +17,11 @@ export default class PopupPresenter {
   popupNewCommentComponent      = new PopupNewCommentView();
 
   init = (siteFooterElement) => {
+    const commentsCount = 4;
     this.siteFooterElement = siteFooterElement;
     render(this.popupTopContainerComponent, this.popupComponent.getElement());
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < commentsCount; i++) {
       render(new PopupCommentItemView(), this.popupCommentListComponent.getElement());
     }
 
