@@ -1,4 +1,4 @@
-import { UserRankView, FilterView, SortView, FilmsCountView } from 'view';
+import { UserRankView, FilmsCountView } from 'view';
 import ContentPresenter from './presenter/content-presenter.js';
 import PopupPresenter from './presenter/popup-presenter.js';
 import {render} from './render.js';
@@ -12,8 +12,6 @@ const contentPresenter = new ContentPresenter();
 const popupPresenter = new PopupPresenter();
 
 render(new UserRankView(), siteHeaderElement);
-render(new FilterView(), siteMainElement);
-render(new SortView(), siteMainElement);
 contentPresenter.init(siteMainElement);
 render(new FilmsCountView(), statisticsElement);
 popupPresenter.init(siteFooterElement);

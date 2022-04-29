@@ -1,4 +1,4 @@
-import { MainContentView, FilmListView } from 'view';
+import { FilterView, SortView, MainContentView, FilmListView } from 'view';
 import {render} from '../render.js';
 
 export default class ContentPresenter {
@@ -11,7 +11,8 @@ export default class ContentPresenter {
 
   init = (siteMainElement) => {
     this.siteMainElement = siteMainElement;
-
+    render(new FilterView(), siteMainElement);
+    render(new SortView(), siteMainElement);
     render(new FilmListView(this.filmsCount), this.mainContentComponent.getElement());
 
     render(
