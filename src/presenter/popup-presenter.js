@@ -10,11 +10,11 @@ import {
 import {render} from '../render.js';
 
 export default class PopupPresenter {
-  popupComponent                = new PopupView();
-  popupTopContainerComponent    = new PopupTopContainerView();
+  popupComponent = new PopupView();
+  popupTopContainerComponent = new PopupTopContainerView();
   popupBottomContainerComponent = new PopupBottomContainerView();
-  popupCommentListComponent     = new PopupCommentListView();
-  popupNewCommentComponent      = new PopupNewCommentView();
+  popupCommentListComponent = new PopupCommentListView();
+  popupNewCommentComponent = new PopupNewCommentView();
 
   init = (siteFooterElement) => {
     const commentsCount = 4;
