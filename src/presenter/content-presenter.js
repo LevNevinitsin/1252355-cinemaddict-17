@@ -1,4 +1,4 @@
-import { FilterView, SortView, MainContentView, FilmListView } from 'view';
+import { FilterView, SortView, MainContentView, FilmListView, ShowMoreButtonView } from 'view';
 import {render} from '../render.js';
 
 const FILMS_COUNT = 5;
@@ -11,12 +11,14 @@ const RatingDescription = {
 
 export default class ContentPresenter {
   mainContentComponent = new MainContentView();
+  filmsListComponent = new FilmListView(FILMS_COUNT);
 
   init = (siteMainElement) => {
     this.siteMainElement = siteMainElement;
     render(new FilterView(), siteMainElement);
     render(new SortView(), siteMainElement);
-    render(new FilmListView(FILMS_COUNT), this.mainContentComponent.getElement());
+    render(this.filmsListComponent, this.mainContentComponent.getElement());
+    render(new ShowMoreButtonView(), this.filmsListComponent.getElement());
 
     render(
       new FilmListView(RATING_FILMS, RatingDescription.TOP_RATED),
