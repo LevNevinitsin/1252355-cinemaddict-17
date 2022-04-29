@@ -1,6 +1,6 @@
 import UserRankView from './view/user-rank-view.js';
 import FilmsCountView from './view/films-count-view.js';
-import FilterPresenter     from './presenter/filter-presenter.js';
+import FilterView from './view/filter-view.js';
 import ContentPresenter    from './presenter/content-presenter.js';
 import PopupPresenter      from './presenter/popup-presenter.js';
 import SortView            from './view/sort-view.js';
@@ -11,12 +11,11 @@ const siteMainElement   = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const statisticsElement = siteFooterElement.querySelector('.footer__statistics');
 
-const filterPresenter     = new FilterPresenter();
 const contentPresenter    = new ContentPresenter();
 const popupPresenter      = new PopupPresenter();
 
 render(new UserRankView(), siteHeaderElement);
-filterPresenter.init(siteMainElement);
+render(new FilterView(), siteHeaderElement);
 render(new SortView(), siteMainElement);
 contentPresenter.init(siteMainElement);
 render(new FilmsCountView(), statisticsElement);
