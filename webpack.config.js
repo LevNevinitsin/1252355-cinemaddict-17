@@ -25,6 +25,7 @@ module.exports = {
   },
   resolve: {
     alias: {
+      presenter: path.resolve(__dirname, 'src/presenter'),
       view: path.resolve(__dirname, 'src/view'),
       popupView: path.resolve(__dirname, 'src/view/popup')
     }

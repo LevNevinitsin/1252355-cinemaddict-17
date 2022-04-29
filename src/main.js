@@ -1,6 +1,5 @@
 import { UserRankView, FilmsCountView } from 'view';
-import ContentPresenter from './presenter/content-presenter.js';
-import PopupPresenter from './presenter/popup-presenter.js';
+import { ContentPresenter, PopupPresenter } from 'presenter';
 import {render} from './render.js';
 
 const siteHeaderElement = document.querySelector('.header');
