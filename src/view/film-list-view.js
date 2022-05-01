@@ -1,38 +1,79 @@
-import { createElement } from 'utils';
+import {
+  createElement,
+  formatRating,
+  getYear,
+  getHumanizedDuration,
+  truncate,
+  pluralize
+} from 'utils';
 
-const createFilmItemsTemplate = (filmsCount) => {
-  let filmItemsTemplate = '';
+const MAX_DESCRIPTION_LENGTH = 140;
+const GENRE_DEFAULT_NUMBER = 0;
 
-  const filmItemTemplate = (
+const createFilmItemTemplate = (film) => {
+  const commentsCount = film.commentsIds.length;
+
+  const {
+    title,
+    totalRating,
+    poster,
+    release,
+    runtime,
+    genre: genres,
+    description,
+  } = film.filmInfo;
+
+  const {
+    watchlist: isInWatchlist,
+    alreadyWatched: hasAlreadyWatched,
+    favorite: isFavorite
+  } = film.userDetails;
+
+  const rating = formatRating(totalRating);
+  const releaseYear = getYear(release.date);
+  const runtimeHumanized = getHumanizedDuration(runtime);
+  const genresText = genres[GENRE_DEFAULT_NUMBER];
+  const descriptionShort = truncate(description, MAX_DESCRIPTION_LENGTH);
+  const commentsInfo = pluralize(commentsCount, 'comment');
+
+  const watchlistActiveClassName = isInWatchlist ? 'film-card__controls-item--active' : '';
+  const alreadyWatchedActiveClassName = hasAlreadyWatched ? 'film-card__controls-item--active' : '';
+  const favoriteActiveClassName = isFavorite ? 'film-card__controls-item--active' : '';
+
+  return (
     `<article class="film-card">
       <a class="film-card__link">
-        <h3 class="film-card__title">The Dance of Life</h3>
-        <p class="film-card__rating">8.3</p>
+        <h3 class="film-card__title">${title}</h3>
+        <p class="film-card__rating">${rating}</p>
         <p class="film-card__info">
-          <span class="film-card__year">1929</span>
-          <span class="film-card__duration">1h 55m</span>
-          <span class="film-card__genre">Musical</span>
+          <span class="film-card__year">${releaseYear}</span>
+          <span class="film-card__duration">${runtimeHumanized}</span>
+          <span class="film-card__genre">${genresText}</span>
         </p>
-        <img src="./images/posters/the-dance-of-life.jpg" alt="" class="film-card__poster">
-        <p class="film-card__description">Burlesque comic Ralph "Skid" Johnson (Skelly), and specialty dancer Bonny Lee King (Carroll), end up together on a cold, rainy night at a tr…</p>
-        <span class="film-card__comments">5 comments</span>
+        <img src="${poster}" alt="" class="film-card__poster">
+        <p class="film-card__description">${descriptionShort}</p>
+        <span class="film-card__comments">${commentsInfo}</span>
       </a>
       <div class="film-card__controls">
-        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
-        <button class="film-card__controls-item film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>
-        <button class="film-card__controls-item film-card__controls-item--favorite" type="button">Mark as favorite</button>
+        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistActiveClassName}" type="button">Add to watchlist</button>
+        <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${alreadyWatchedActiveClassName}" type="button">Mark as watched</button>
+        <button class="film-card__controls-item film-card__controls-item--favorite ${favoriteActiveClassName}" type="button">Mark as favorite</button>
       </div>
     </article>`
   );
+};
 
-  for (let i = 0; i < filmsCount; i++) {
-    filmItemsTemplate += filmItemTemplate;
+const createFilmItemsTemplate = (films, filmsCount) => {
+  let filmItemsTemplate = '';
+
+  for (let i = 0; i < Math.min(films.length, filmsCount); i++) {
+    filmItemsTemplate += createFilmItemTemplate(films[i]);
   }
 
   return filmItemsTemplate;
 };
 
-const createFilmListTemplate = (filmsCount, listTitle = null) => {
+const createFilmListTemplate = (films, filmsCount, listTitle = null) => {
   const extraBlockModificator = 'extra';
 
   let modificatorClass = '';
@@ -45,7 +86,7 @@ const createFilmListTemplate = (filmsCount, listTitle = null) => {
     listTitleTemplate = `<h2 class="films-list__title">${listTitle}</h2>`;
   }
 
-  const filmItemsTemplate = createFilmItemsTemplate(filmsCount);
+  const filmItemsTemplate = createFilmItemsTemplate(films, filmsCount);
 
   return (
     `<section class="films-list ${modificatorClass}">
@@ -58,13 +99,14 @@ const createFilmListTemplate = (filmsCount, listTitle = null) => {
 };
 
 export default class FilmListView {
-  constructor(filmsCount, listTitle) {
+  constructor(films, filmsCount, listTitle = null) {
+    this.films = films;
     this.filmsCount = filmsCount;
     this.listTitle = listTitle;
   }
 
   getTemplate() {
-    return createFilmListTemplate(this.filmsCount, this.listTitle);
+    return createFilmListTemplate(this.films, this.filmsCount, this.listTitle);
   }
 
   getElement() {
