@@ -11,22 +11,27 @@ const RatingDescription = {
 
 export default class ContentPresenter {
   mainContentComponent = new MainContentView();
-  filmsListComponent = new FilmListView(FILMS_COUNT);
 
-  init = (siteMainElement) => {
+  init = (siteMainElement, filmModel) => {
     this.siteMainElement = siteMainElement;
+    this.filmModel = filmModel;
+    this.films = [...this.filmModel.getFilms()];
     render(new FilterView(), this.siteMainElement);
     render(new SortView(), this.siteMainElement);
+    this.filmsListComponent = new FilmListView(this.films, FILMS_COUNT);
     render(this.filmsListComponent, this.mainContentComponent.getElement());
     render(new ShowMoreButtonView(), this.filmsListComponent.getElement());
+    const filmsSortedByRating = this.filmModel.getFilmsSortedBy('rating');
 
     render(
-      new FilmListView(RATING_COUNT, RatingDescription.TOP_RATED),
+      new FilmListView(filmsSortedByRating, RATING_COUNT, RatingDescription.TOP_RATED),
       this.mainContentComponent.getElement()
     );
 
+    const filmsSortedByCommentsCount = this.filmModel.getFilmsSortedBy('commentsCount');
+
     render(
-      new FilmListView(RATING_COUNT, RatingDescription.MOST_COMMENTED),
+      new FilmListView(filmsSortedByCommentsCount, RATING_COUNT, RatingDescription.MOST_COMMENTED),
       this.mainContentComponent.getElement()
     );
 
