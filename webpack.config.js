@@ -28,7 +28,9 @@ module.exports = {
       presenter: path.resolve(__dirname, 'src/presenter'),
       view: path.resolve(__dirname, 'src/view'),
       popup: path.resolve(__dirname, 'src/view/popup'),
-      utils: path.resolve(__dirname, 'src/utils.js')
+      utils: path.resolve(__dirname, 'src/utils.js'),
+      model: path.resolve(__dirname, 'src/model'),
+      mock: path.resolve(__dirname, 'src/mock'),
     }
   }
 };
