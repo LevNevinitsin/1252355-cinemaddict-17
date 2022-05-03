@@ -1,4 +1,20 @@
-import { FilterView, SortView, MainContentView, FilmListView, ShowMoreButtonView } from 'view';
+import {
+  FilterView,
+  SortView,
+  MainContentView,
+  FilmListView,
+  ShowMoreButtonView,
+  PopupView
+} from 'view';
+
+import {
+  PopupCommentListView,
+  PopupCommentItemView,
+  PopupTopContainerView,
+  PopupBottomContainerView,
+  PopupNewCommentView,
+} from 'popup';
+
 import { render } from 'utils';
 
 const FILMS_COUNT = 5;
@@ -12,9 +28,12 @@ const RatingDescription = {
 export default class ContentPresenter {
   mainContentComponent = new MainContentView();
 
-  init = (siteMainElement, filmModel) => {
+  init = (siteMainElement, siteFooterElement, filmModel, commentModel) => {
+    const popupFilmId = 1;
     this.siteMainElement = siteMainElement;
+    this.siteFooterElement = siteFooterElement;
     this.filmModel = filmModel;
+    this.commentModel = commentModel;
     this.films = [...this.filmModel.getFilms()];
     render(new FilterView(), this.siteMainElement);
     render(new SortView(), this.siteMainElement);
@@ -36,6 +55,32 @@ export default class ContentPresenter {
     );
 
     render(this.mainContentComponent, this.siteMainElement);
+    this.renderPopup(popupFilmId);
+  };
+
+  renderPopup = (popupFilmId) => {
+    this.popupFilm = this.filmModel.getFilm(popupFilmId);
+    this.popupComponent = new PopupView();
+    this.popupCommentListComponent = new PopupCommentListView();
+    this.popupNewCommentComponent = new PopupNewCommentView();
+    this.popupTopContainerComponent = new PopupTopContainerView(this.popupFilm);
+    render(this.popupTopContainerComponent, this.popupComponent.getElement());
+
+    this.popupBottomContainerComponent = new PopupBottomContainerView(
+      this.popupFilm.commentsIds.length
+    );
+
+    // пока нет сервера, передаём filmModel для "целостности" рыбы
+    this.filmComments = this.commentModel.getFilmComments(popupFilmId, this.filmModel);
+
+    this.filmComments.forEach((comment) => {
+      render(new PopupCommentItemView(comment), this.popupCommentListComponent.getElement());
+    });
+
+    render(this.popupCommentListComponent, this.popupBottomContainerComponent.getElement());
+    render(this.popupNewCommentComponent, this.popupBottomContainerComponent.getElement());
+    render(this.popupBottomContainerComponent, this.popupComponent.getElement());
+    render(this.popupComponent, this.siteFooterElement, 'afterend');
   };
 }
 
