@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
 import relativeTimePlugin from 'dayjs/plugin/relativeTime';
+import { customAlphabet } from 'nanoid/non-secure';
 
 const RenderPosition = {
   BEFOREBEGIN: 'beforebegin',
@@ -120,6 +121,11 @@ const getRandomArrayElements = (
   return result;
 };
 
+const getRandomId = (alphabet = '01234567890', length = 10) => {
+  const nanoid = customAlphabet(alphabet, length);
+  return nanoid();
+};
+
 export {
   RenderPosition,
   createElement,
@@ -135,4 +141,5 @@ export {
   getRandomInteger,
   getRandomArrayElement,
   getRandomArrayElements,
+  getRandomId,
 };
