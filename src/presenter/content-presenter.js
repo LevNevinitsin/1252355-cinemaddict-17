@@ -29,28 +29,30 @@ export default class ContentPresenter {
   mainContentComponent = new MainContentView();
 
   init = (siteMainElement, siteFooterElement, filmModel, commentModel) => {
-    const popupFilmId = 1;
     this.siteMainElement = siteMainElement;
     this.siteFooterElement = siteFooterElement;
     this.filmModel = filmModel;
     this.commentModel = commentModel;
     this.films = [...this.filmModel.getFilms()];
+    const popupFilmId = this.films[0].id;
     render(new FilterView(), this.siteMainElement);
     render(new SortView(), this.siteMainElement);
     this.filmsListComponent = new FilmListView(this.films, FILMS_COUNT);
     render(this.filmsListComponent, this.mainContentComponent.getElement());
     render(new ShowMoreButtonView(), this.filmsListComponent.getElement());
-    const filmsSortedByRating = this.filmModel.getFilmsSortedBy('rating');
 
     render(
-      new FilmListView(filmsSortedByRating, RATING_COUNT, RatingDescription.TOP_RATED),
+      new FilmListView(this.filmModel.topRatingFilms, RATING_COUNT, RatingDescription.TOP_RATED),
       this.mainContentComponent.getElement()
     );
 
-    const filmsSortedByCommentsCount = this.filmModel.getFilmsSortedBy('commentsCount');
-
     render(
-      new FilmListView(filmsSortedByCommentsCount, RATING_COUNT, RatingDescription.MOST_COMMENTED),
+      new FilmListView(
+        this.filmModel.mostCommentedFilms,
+        RATING_COUNT,
+        RatingDescription.MOST_COMMENTED
+      ),
+
       this.mainContentComponent.getElement()
     );
 
@@ -70,7 +72,6 @@ export default class ContentPresenter {
       this.popupFilm.commentsIds.length
     );
 
-    // пока нет сервера, передаём filmModel для "целостности" рыбы
     this.filmComments = this.commentModel.getFilmComments(popupFilmId, this.filmModel);
 
     this.filmComments.forEach((comment) => {
