@@ -11,6 +11,7 @@ const MAX_DESCRIPTION_LENGTH = 140;
 const GENRE_DEFAULT_NUMBER = 0;
 
 const createFilmItemTemplate = (film) => {
+  const id = film.id;
   const commentsCount = film.commentsIds.length;
 
   const {
@@ -41,7 +42,7 @@ const createFilmItemTemplate = (film) => {
   const favoriteActiveClassName = isFavorite ? 'film-card__controls-item--active' : '';
 
   return (
-    `<article class="film-card">
+    `<article class="film-card" data-id="${id}">
       <a class="film-card__link">
         <h3 class="film-card__title">${title}</h3>
         <p class="film-card__rating">${rating}</p>
