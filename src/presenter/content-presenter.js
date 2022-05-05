@@ -56,6 +56,7 @@ export default class ContentPresenter {
     this.#siteFooterElement = siteFooterElement;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
+
     this.#films = [...this.#filmModel.films];
     render(new FilterView(), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
