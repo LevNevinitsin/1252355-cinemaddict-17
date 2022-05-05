@@ -138,9 +138,7 @@ export default class ContentPresenter {
     render(this.#popupComponent, this.#siteFooterElement, 'afterend');
 
     this.#popupTopContainerComponent.element.querySelector(popupCloseSelector).addEventListener(
-      'click', () => {
-        this.#closePopup();
-      }
+      'click', this.#closePopup
     );
   };
 }
