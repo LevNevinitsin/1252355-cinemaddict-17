@@ -99,25 +99,27 @@ const createFilmListTemplate = (films, filmsCount, listTitle = null) => {
 };
 
 export default class FilmListView {
+  #element = null;
+
   constructor(films, filmsCount, listTitle = null) {
     this.films = films;
     this.filmsCount = filmsCount;
     this.listTitle = listTitle;
   }
 
-  getTemplate() {
+  get template() {
     return createFilmListTemplate(this.films, this.filmsCount, this.listTitle);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

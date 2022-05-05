@@ -14,15 +14,20 @@ const sortCallbacksMap = {
 };
 
 export default class FilmModel {
+  #films;
+
   constructor() {
-    this.films = generateFilms(FILMS_COUNT);
+    this.#films = generateFilms(FILMS_COUNT);
     this.topRatingFilms = this.getFilmsSortedBy(SortAttribute.RATING).slice(0, RATING_COUNT);
 
     this.mostCommentedFilms = this.getFilmsSortedBy(SortAttribute.COMMENTS_COUNT)
       .slice(0, RATING_COUNT);
   }
 
-  getFilms = () => this.films;
-  getFilm = (filmId) => this.films.find((film) => film.id === filmId);
-  getFilmsSortedBy = (attributeName) => [...this.films].sort(sortCallbacksMap[attributeName]);
+  get films() {
+    return this.#films;
+  }
+
+  getFilm = (filmId) => this.#films.find((film) => film.id === filmId);
+  getFilmsSortedBy = (attributeName) => [...this.#films].sort(sortCallbacksMap[attributeName]);
 }
