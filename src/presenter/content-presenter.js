@@ -48,6 +48,7 @@ export default class ContentPresenter {
   #popupTopContainerComponent;
   #popupBottomContainerComponent;
   #filmComments;
+  #isPopupOpened = false;
 
   init = (bodyElement, siteMainElement, siteFooterElement, filmModel, commentModel) => {
     this.#bodyElement = bodyElement;
@@ -84,8 +85,9 @@ export default class ContentPresenter {
 
     this.#filmsCardsElements.forEach((filmCardElement) => {
       filmCardElement.addEventListener('click', (evt) => {
-        if (evt.target.tagName !== BUTTON_TAG_NAME) {
+        if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
           this.#openPopup(filmCardElement.dataset.id);
+          this.#isPopupOpened = true;
         }
       });
     });
@@ -101,6 +103,7 @@ export default class ContentPresenter {
     this.#popupComponent.element.remove();
     this.#popupComponent.removeElement();
     this.#bodyElement.classList.remove(bodyHideOverflowClass);
+    this.#isPopupOpened = false;
   };
 
   #onEscKeyDown = (evt) => {
