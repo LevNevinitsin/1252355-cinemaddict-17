@@ -9,23 +9,25 @@ const createPopupBottomContainerTemplate = (commentsCount) => (
 );
 
 export default class PopupBottomContainerView {
+  #element = null;
+
   constructor(commentsCount) {
     this.commentsCount = commentsCount;
   }
 
-  getTemplate() {
+  get template() {
     return createPopupBottomContainerTemplate(this.commentsCount);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
