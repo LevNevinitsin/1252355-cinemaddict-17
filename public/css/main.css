@@ -62,6 +62,8 @@ html {
 }
 
 body {
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
   box-sizing: border-box;
   max-width: 1240px;
   padding: var(--vertical-gap) var(--horizontal-gap) 0;
