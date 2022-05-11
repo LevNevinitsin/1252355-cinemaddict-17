@@ -1,6 +1,6 @@
 import { generateFilms } from 'mock';
 
-const FILMS_COUNT = 5;
+const FILMS_COUNT = 13;
 const RATING_COUNT = 2;
 
 const SortAttribute = {

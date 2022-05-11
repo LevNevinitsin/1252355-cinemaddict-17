@@ -3,7 +3,10 @@ import {
   SortView,
   MainContentView,
   FilmListView,
+  FilmsContainerView,
+  FilmItemView,
   ShowMoreButtonView,
+  NoFilmsView,
   PopupView
 } from 'view';
 
@@ -26,7 +29,7 @@ const RatingDescription = {
   MOST_COMMENTED: 'Most commented',
 };
 
-const filmCardSelector = '.film-card';
+const filmsListRerenderPosition = 'afterbegin';
 const popupCloseSelector = '.film-details__close-btn';
 const bodyHideOverflowClass = 'hide-overflow';
 
@@ -37,9 +40,11 @@ export default class ContentPresenter {
   #filmModel;
   #commentModel;
   #films;
-  #filmsListComponent;
+  #filmsListComponent = new FilmListView();
+  #filmsContainerComponent;
+  #showMoreButtonComponent;
+  #renderedFilmsCount;
   #mainContentComponent = new MainContentView();
-  #filmsCardsElements;
 
   #popupFilm;
   #popupComponent;
@@ -56,42 +61,84 @@ export default class ContentPresenter {
     this.#siteFooterElement = siteFooterElement;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
-
     this.#films = [...this.#filmModel.films];
+
     render(new FilterView(), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
-    this.#filmsListComponent = new FilmListView(this.#films, FILMS_COUNT);
-    render(this.#filmsListComponent, this.#mainContentComponent.element);
-    render(new ShowMoreButtonView(), this.#filmsListComponent.element);
 
-    render(
-      new FilmListView(this.#filmModel.topRatingFilms, RATING_COUNT, RatingDescription.TOP_RATED),
-      this.#mainContentComponent.element
-    );
+    if (!this.#films.length) {
+      render(new NoFilmsView(), this.#filmsListComponent.element);
+      render(this.#filmsListComponent, this.#mainContentComponent.element);
+    } else {
+      this.#renderFilmsList(this.#films, FILMS_COUNT);
 
-    render(
-      new FilmListView(
-        this.#filmModel.mostCommentedFilms,
-        RATING_COUNT,
-        RatingDescription.MOST_COMMENTED
-      ),
+      if (this.#films.length > FILMS_COUNT) {
+        this.#showMoreButtonComponent = new ShowMoreButtonView();
+        render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
-      this.#mainContentComponent.element
-    );
+        this.#showMoreButtonComponent.element.addEventListener(
+          'click', this.#handleShowMoreButtonClick
+        );
+      }
+
+      this.#renderFilmsList(
+        this.#filmModel.topRatingFilms, RATING_COUNT, RatingDescription.TOP_RATED
+      );
+
+      this.#renderFilmsList(
+        this.#filmModel.mostCommentedFilms, RATING_COUNT, RatingDescription.MOST_COMMENTED
+      );
+    }
 
     render(this.#mainContentComponent, this.#siteMainElement);
+  };
 
-    this.#filmsCardsElements = this.#mainContentComponent.element
-      .querySelectorAll(filmCardSelector);
+  #renderFilmsList = (films, filmsCount, listTitle = null) => {
+    const filmsListComponent = !listTitle ? this.#filmsListComponent : new FilmListView(listTitle);
+    const filmsContainerComponent = new FilmsContainerView();
+    filmsCount = Math.min(films.length, filmsCount);
 
-    this.#filmsCardsElements.forEach((filmCardElement) => {
-      filmCardElement.addEventListener('click', (evt) => {
-        if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
-          this.#openPopup(filmCardElement.dataset.id);
-          this.#isPopupOpened = true;
-        }
-      });
+    if (!listTitle) {
+      this.#filmsContainerComponent = filmsContainerComponent;
+      this.#renderedFilmsCount = filmsCount;
+    }
+
+    for (let i = 0; i < filmsCount; i++) {
+      this.#renderFilm(films[i], filmsContainerComponent.element);
+    }
+
+    render(filmsContainerComponent, filmsListComponent.element);
+    render(filmsListComponent, this.#mainContentComponent.element);
+  };
+
+  #handleShowMoreButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#filmsListComponent.element.remove();
+
+    this.#films
+      .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_COUNT)
+      .forEach((film) => { this.#renderFilm(film, this.#filmsContainerComponent.element); });
+
+    render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
+    this.#renderedFilmsCount += FILMS_COUNT;
+
+    if (this.#renderedFilmsCount >= this.#films.length) {
+      this.#showMoreButtonComponent.element.remove();
+      this.#showMoreButtonComponent.removeElement();
+    }
+  };
+
+  #renderFilm = (film, container) => {
+    const filmComponent = new FilmItemView(film);
+
+    filmComponent.element.addEventListener('click', (evt) => {
+      if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
+        this.#openPopup(film.id);
+        this.#isPopupOpened = true;
+      }
     });
+
+    render(filmComponent, container);
   };
 
   #openPopup = (filmId) => {
