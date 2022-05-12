@@ -68,4 +68,14 @@ export default class FilmItemView extends AbstractView {
   get template() {
     return createFilmItemTemplate(this.#film);
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click(evt);
+  };
 }

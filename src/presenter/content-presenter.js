@@ -30,7 +30,6 @@ const RatingDescription = {
 };
 
 const filmsListRerenderPosition = 'afterbegin';
-const popupCloseSelector = '.film-details__close-btn';
 const bodyHideOverflowClass = 'hide-overflow';
 
 export default class ContentPresenter {
@@ -76,9 +75,7 @@ export default class ContentPresenter {
         this.#showMoreButtonComponent = new ShowMoreButtonView();
         render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
-        this.#showMoreButtonComponent.element.addEventListener(
-          'click', this.#handleShowMoreButtonClick
-        );
+        this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
       }
 
       this.#renderFilmsList(
@@ -111,8 +108,7 @@ export default class ContentPresenter {
     render(filmsListComponent, this.#mainContentComponent.element);
   };
 
-  #handleShowMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #handleShowMoreButtonClick = () => {
     this.#filmsListComponent.element.remove();
 
     this.#films
@@ -131,7 +127,7 @@ export default class ContentPresenter {
   #renderFilm = (film, container) => {
     const filmComponent = new FilmItemView(film);
 
-    filmComponent.element.addEventListener('click', (evt) => {
+    filmComponent.setClickHandler((evt) => {
       if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
         this.#openPopup(film.id);
         this.#isPopupOpened = true;
@@ -185,9 +181,7 @@ export default class ContentPresenter {
     render(this.#popupBottomContainerComponent, this.#popupComponent.element);
     render(this.#popupComponent, this.#siteFooterElement, 'afterend');
 
-    this.#popupTopContainerComponent.element.querySelector(popupCloseSelector).addEventListener(
-      'click', this.#closePopup
-    );
+    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
   };
 }
 

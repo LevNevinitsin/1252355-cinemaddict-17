@@ -2,6 +2,7 @@ import { AbstractView } from 'frameworkView';
 import { formatRating, formatDate, getHumanizedDuration } from 'utils';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
+const popupCloseSelector = '.film-details__close-btn';
 
 const createGenresTemplate = (genres) => (
   genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')
@@ -121,4 +122,14 @@ export default class PopupTopContainerView extends AbstractView {
   get template() {
     return createPopupTopContainerTemplate(this.#film);
   }
+
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector(popupCloseSelector).addEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
