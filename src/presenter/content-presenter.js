@@ -18,7 +18,7 @@ import {
   PopupNewCommentView,
 } from 'popup';
 
-import { render } from 'utils';
+import { render, remove } from 'framework';
 
 const FILMS_COUNT = 5;
 const RATING_COUNT = 2;
@@ -119,8 +119,7 @@ export default class ContentPresenter {
     this.#renderedFilmsCount += FILMS_COUNT;
 
     if (this.#renderedFilmsCount >= this.#films.length) {
-      this.#showMoreButtonComponent.element.remove();
-      this.#showMoreButtonComponent.removeElement();
+      remove(this.#showMoreButtonComponent);
     }
   };
 
@@ -144,8 +143,7 @@ export default class ContentPresenter {
   };
 
   #closePopup = () => {
-    this.#popupComponent.element.remove();
-    this.#popupComponent.removeElement();
+    remove(this.#popupComponent);
     this.#bodyElement.classList.remove(bodyHideOverflowClass);
     this.#isPopupOpened = false;
   };

@@ -1,7 +1,7 @@
 import { UserRankView, FilmsCountView } from 'view';
 import { ContentPresenter } from 'presenter';
 import { FilmModel, CommentModel } from 'model';
-import { render } from 'utils';
+import { render } from 'framework';
 
 const bodyElement = document.querySelector('body');
 const siteHeaderElement = bodyElement.querySelector('.header');
