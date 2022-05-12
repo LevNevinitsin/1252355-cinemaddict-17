@@ -18,7 +18,7 @@ import {
   PopupNewCommentView,
 } from 'popup';
 
-import { render } from 'utils';
+import { render, remove } from 'framework';
 
 const FILMS_COUNT = 5;
 const RATING_COUNT = 2;
@@ -30,7 +30,6 @@ const RatingDescription = {
 };
 
 const filmsListRerenderPosition = 'afterbegin';
-const popupCloseSelector = '.film-details__close-btn';
 const bodyHideOverflowClass = 'hide-overflow';
 
 export default class ContentPresenter {
@@ -76,9 +75,7 @@ export default class ContentPresenter {
         this.#showMoreButtonComponent = new ShowMoreButtonView();
         render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
-        this.#showMoreButtonComponent.element.addEventListener(
-          'click', this.#handleShowMoreButtonClick
-        );
+        this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
       }
 
       this.#renderFilmsList(
@@ -111,27 +108,25 @@ export default class ContentPresenter {
     render(filmsListComponent, this.#mainContentComponent.element);
   };
 
-  #handleShowMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #handleShowMoreButtonClick = () => {
     this.#filmsListComponent.element.remove();
 
     this.#films
       .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_COUNT)
-      .forEach((film) => { this.#renderFilm(film, this.#filmsContainerComponent.element); });
+      .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
 
     render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
     this.#renderedFilmsCount += FILMS_COUNT;
 
     if (this.#renderedFilmsCount >= this.#films.length) {
-      this.#showMoreButtonComponent.element.remove();
-      this.#showMoreButtonComponent.removeElement();
+      remove(this.#showMoreButtonComponent);
     }
   };
 
   #renderFilm = (film, container) => {
     const filmComponent = new FilmItemView(film);
 
-    filmComponent.element.addEventListener('click', (evt) => {
+    filmComponent.setClickHandler((evt) => {
       if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
         this.#openPopup(film.id);
         this.#isPopupOpened = true;
@@ -148,8 +143,7 @@ export default class ContentPresenter {
   };
 
   #closePopup = () => {
-    this.#popupComponent.element.remove();
-    this.#popupComponent.removeElement();
+    remove(this.#popupComponent);
     this.#bodyElement.classList.remove(bodyHideOverflowClass);
     this.#isPopupOpened = false;
   };
@@ -185,9 +179,7 @@ export default class ContentPresenter {
     render(this.#popupBottomContainerComponent, this.#popupComponent.element);
     render(this.#popupComponent, this.#siteFooterElement, 'afterend');
 
-    this.#popupTopContainerComponent.element.querySelector(popupCloseSelector).addEventListener(
-      'click', this.#closePopup
-    );
+    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
   };
 }
 

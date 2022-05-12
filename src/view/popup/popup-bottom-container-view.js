@@ -1,4 +1,4 @@
-import { createElement } from 'utils';
+import { AbstractView } from 'frameworkView';
 
 const createPopupBottomContainerTemplate = (commentsCount) => (
   `<div class="film-details__bottom-container">
@@ -8,26 +8,15 @@ const createPopupBottomContainerTemplate = (commentsCount) => (
   </div>`
 );
 
-export default class PopupBottomContainerView {
-  #element = null;
+export default class PopupBottomContainerView extends AbstractView {
+  #commentsCount;
 
   constructor(commentsCount) {
-    this.commentsCount = commentsCount;
+    super();
+    this.#commentsCount = commentsCount;
   }
 
   get template() {
-    return createPopupBottomContainerTemplate(this.commentsCount);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+    return createPopupBottomContainerTemplate(this.#commentsCount);
   }
 }

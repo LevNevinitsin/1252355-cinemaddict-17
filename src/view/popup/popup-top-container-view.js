@@ -1,6 +1,8 @@
-import { createElement, formatRating, formatDate, getHumanizedDuration } from 'utils';
+import { AbstractView } from 'frameworkView';
+import { formatRating, formatDate, getHumanizedDuration } from 'utils';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
+const popupCloseSelector = '.film-details__close-btn';
 
 const createGenresTemplate = (genres) => (
   genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')
@@ -109,26 +111,25 @@ const createPopupTopContainerTemplate = (film) => {
   );
 };
 
-export default class PopupTopContainerView {
-  #element = null;
+export default class PopupTopContainerView extends AbstractView {
+  #film;
 
   constructor(film) {
-    this.film = film;
+    super();
+    this.#film = film;
   }
 
   get template() {
-    return createPopupTopContainerTemplate(this.film);
+    return createPopupTopContainerTemplate(this.#film);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector(popupCloseSelector).addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

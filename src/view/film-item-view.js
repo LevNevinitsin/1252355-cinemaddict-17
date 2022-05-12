@@ -1,11 +1,5 @@
-import {
-  createElement,
-  formatRating,
-  getYear,
-  getHumanizedDuration,
-  truncate,
-  pluralize
-} from 'utils';
+import { AbstractView } from 'frameworkView';
+import { formatRating, getYear, getHumanizedDuration, truncate, pluralize } from 'utils';
 
 const MAX_DESCRIPTION_LENGTH = 140;
 const GENRE_DEFAULT_NUMBER = 0;
@@ -63,26 +57,25 @@ const createFilmItemTemplate = (film) => {
   );
 };
 
-export default class FilmItemView {
-  #element = null;
+export default class FilmItemView extends AbstractView {
+  #film;
 
   constructor(film) {
-    this.film = film;
+    super();
+    this.#film = film;
   }
 
   get template() {
-    return createFilmItemTemplate(this.film);
+    return createFilmItemTemplate(this.#film);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click(evt);
+  };
 }

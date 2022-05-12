@@ -3,40 +3,6 @@ import durationPlugin from 'dayjs/plugin/duration';
 import relativeTimePlugin from 'dayjs/plugin/relativeTime';
 import { customAlphabet } from 'nanoid/non-secure';
 
-const RenderPosition = {
-  BEFOREBEGIN: 'beforebegin',
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-  AFTEREND: 'afterend',
-};
-
-const createElement = (template) => {
-  const newElement = document.createElement('div');
-  newElement.innerHTML = template;
-
-  return newElement.firstElementChild;
-};
-
-const render = (component, container, place = RenderPosition.BEFOREEND) => {
-  const element = component.element;
-
-  switch (place) {
-    case RenderPosition.BEFOREBEGIN:
-      container.before(element);
-      break;
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-    case RenderPosition.AFTEREND:
-      container.after(element);
-      break;
-  }
-};
-
-
 const formatRating = (rating, digitsCount = 1) => rating.toFixed(digitsCount);
 const getYear = (date) => dayjs(date).format('YYYY');
 const formatDate = (date, format) => dayjs(date).format(format);
@@ -127,9 +93,6 @@ const getRandomId = (alphabet = '01234567890', length = 10) => {
 };
 
 export {
-  RenderPosition,
-  createElement,
-  render,
   formatRating,
   getYear,
   formatDate,
