@@ -1,4 +1,5 @@
-import { createElement, getRelativeTime } from 'utils';
+import { AbstractView } from 'frameworkView';
+import { getRelativeTime } from 'utils';
 
 const createPopupCommentItemTemplate = (comment) => {
   const {
@@ -27,26 +28,15 @@ const createPopupCommentItemTemplate = (comment) => {
   );
 };
 
-export default class PopupCommentItemView {
-  #element = null;
+export default class PopupCommentItemView extends AbstractView {
+  #comment;
 
   constructor(comment) {
-    this.comment = comment;
+    super();
+    this.#comment = comment;
   }
 
   get template() {
-    return createPopupCommentItemTemplate(this.comment);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+    return createPopupCommentItemTemplate(this.#comment);
   }
 }

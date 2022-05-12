@@ -1,4 +1,4 @@
-import { createElement } from 'utils';
+import { AbstractView } from 'frameworkView';
 
 const extraBlockModificator = 'extra';
 
@@ -16,26 +16,15 @@ const createFilmListTemplate = (listTitle) => {
   return `<section class="films-list ${modificatorClass}">${listTitleTemplate}</section>`;
 };
 
-export default class FilmListView {
-  #element = null;
+export default class FilmListView extends AbstractView {
+  #listTitle;
 
   constructor(listTitle = null) {
-    this.listTitle = listTitle;
+    super();
+    this.#listTitle = listTitle;
   }
 
   get template() {
-    return createFilmListTemplate(this.listTitle);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+    return createFilmListTemplate(this.#listTitle);
   }
 }

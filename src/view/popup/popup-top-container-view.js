@@ -1,4 +1,5 @@
-import { createElement, formatRating, formatDate, getHumanizedDuration } from 'utils';
+import { AbstractView } from 'frameworkView';
+import { formatRating, formatDate, getHumanizedDuration } from 'utils';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
 
@@ -109,26 +110,15 @@ const createPopupTopContainerTemplate = (film) => {
   );
 };
 
-export default class PopupTopContainerView {
-  #element = null;
+export default class PopupTopContainerView extends AbstractView {
+  #film;
 
   constructor(film) {
-    this.film = film;
+    super();
+    this.#film = film;
   }
 
   get template() {
-    return createPopupTopContainerTemplate(this.film);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+    return createPopupTopContainerTemplate(this.#film);
   }
 }
