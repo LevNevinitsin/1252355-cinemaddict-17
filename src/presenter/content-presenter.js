@@ -113,7 +113,7 @@ export default class ContentPresenter {
 
     this.#films
       .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_COUNT)
-      .forEach((film) => { this.#renderFilm(film, this.#filmsContainerComponent.element); });
+      .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
 
     render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
     this.#renderedFilmsCount += FILMS_COUNT;
