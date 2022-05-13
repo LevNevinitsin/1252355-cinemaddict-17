@@ -1,5 +1,9 @@
 import { AbstractView } from 'frameworkView';
 
+const MOVIE_BUFF_COUNT = 21;
+const FAN_COUNT = 11;
+const NOVICE_COUNT = 1;
+
 const Rank = {
   NOVICE: 'Novice',
   FAN: 'Fan',
@@ -7,15 +11,15 @@ const Rank = {
 };
 
 const getRank = (watchedFilmsCount) => {
-  if (watchedFilmsCount >= 21) {
+  if (watchedFilmsCount >= MOVIE_BUFF_COUNT) {
     return Rank.MOVIE_BUFF;
   }
 
-  if (watchedFilmsCount >= 11) {
+  if (watchedFilmsCount >= FAN_COUNT) {
     return Rank.FAN;
   }
 
-  if (watchedFilmsCount >= 1) {
+  if (watchedFilmsCount >= NOVICE_COUNT) {
     return Rank.NOVICE;
   }
 };
