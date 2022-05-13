@@ -19,6 +19,7 @@ import {
 } from 'popup';
 
 import { render, remove } from 'framework';
+import { generateFilter } from 'mock';
 
 const FILMS_COUNT = 5;
 const RATING_COUNT = 2;
@@ -62,7 +63,8 @@ export default class ContentPresenter {
     this.#commentModel = commentModel;
     this.#films = [...this.#filmModel.films];
 
-    render(new FilterView(), this.#siteMainElement);
+    const filters = generateFilter(this.#films);
+    render(new FilterView(filters), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
 
     if (!this.#films.length) {
