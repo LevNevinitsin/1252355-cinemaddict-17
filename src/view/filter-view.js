@@ -1,7 +1,10 @@
 import { AbstractView } from 'frameworkView';
 import { FilterType } from 'const';
+import cn from 'classnames';
 
-const ACTIVE_CLASS = 'main-navigation__item--active';
+const BASE_CLASS = 'main-navigation__item';
+const ACTIVE_MODIFIER = 'active';
+const activeClass = `${BASE_CLASS}--${ACTIVE_MODIFIER}`;
 
 const filtersNamesMap = {
   [FilterType.ALL]: 'All movies',
@@ -12,16 +15,16 @@ const filtersNamesMap = {
 
 const createFilterTemplate = (filter) => {
   const filterName = filter.name;
-  let countElement = `<span class="main-navigation__item-count">${filter.count}</span>`;
-  let activeClass = '';
+  const isFilterAll = filterName === FilterType.ALL;
 
-  if (filterName === FilterType.ALL) {
-    countElement = '';
-    activeClass = ACTIVE_CLASS;
-  }
+  const countElement = !isFilterAll
+    ? `<span class="main-navigation__item-count">${filter.count}</span>`
+    : '';
+
+  const filterClass = cn(BASE_CLASS, { [activeClass]: isFilterAll });
 
   return (
-    `<a href="#${filter.name}" class="main-navigation__item ${activeClass}">
+    `<a href="#${filter.name}" class="${filterClass}">
       ${filtersNamesMap[filterName]} ${countElement}
     </a>`
   );
