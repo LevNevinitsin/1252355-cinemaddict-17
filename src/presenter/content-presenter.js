@@ -7,6 +7,7 @@ import {
   FilmItemView,
   ShowMoreButtonView,
   NoFilmsView,
+  FilmsCountView,
   PopupView
 } from 'view';
 
@@ -21,7 +22,7 @@ import {
 import { render, remove } from 'framework';
 import { generateFilter } from 'mock';
 
-const FILMS_COUNT = 5;
+const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
 const BUTTON_TAG_NAME = 'BUTTON';
 
@@ -37,6 +38,7 @@ export default class ContentPresenter {
   #bodyElement;
   #siteMainElement;
   #siteFooterElement;
+  #statisticsElement;
   #filmModel;
   #commentModel;
   #films;
@@ -55,25 +57,29 @@ export default class ContentPresenter {
   #filmComments;
   #isPopupOpened = false;
 
-  init = (bodyElement, siteMainElement, siteFooterElement, filmModel, commentModel) => {
+  init = (
+    bodyElement, siteMainElement, siteFooterElement, statisticsElement, filmModel, commentModel
+  ) => {
     this.#bodyElement = bodyElement;
     this.#siteMainElement = siteMainElement;
     this.#siteFooterElement = siteFooterElement;
+    this.#statisticsElement = statisticsElement;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
     this.#films = [...this.#filmModel.films];
 
+    const filmsCount = this.#films.length;
     const filters = generateFilter(this.#films);
     render(new FilterView(filters), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
 
-    if (!this.#films.length) {
+    if (!filmsCount) {
       render(new NoFilmsView(), this.#filmsListComponent.element);
       render(this.#filmsListComponent, this.#mainContentComponent.element);
     } else {
-      this.#renderFilmsList(this.#films, FILMS_COUNT);
+      this.#renderFilmsList(this.#films, FILMS_STEP_LIMIT);
 
-      if (this.#films.length > FILMS_COUNT) {
+      if (filmsCount > FILMS_STEP_LIMIT) {
         this.#showMoreButtonComponent = new ShowMoreButtonView();
         render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
@@ -90,6 +96,7 @@ export default class ContentPresenter {
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
+    render(new FilmsCountView(filmsCount), this.#statisticsElement);
   };
 
   #renderFilmsList = (films, filmsCount, listTitle = null) => {
@@ -114,11 +121,11 @@ export default class ContentPresenter {
     this.#filmsListComponent.element.remove();
 
     this.#films
-      .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_COUNT)
+      .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_STEP_LIMIT)
       .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
 
     render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
-    this.#renderedFilmsCount += FILMS_COUNT;
+    this.#renderedFilmsCount += FILMS_STEP_LIMIT;
 
     if (this.#renderedFilmsCount >= this.#films.length) {
       remove(this.#showMoreButtonComponent);
