@@ -1,4 +1,5 @@
 import {
+  UserRankView,
   FilterView,
   SortView,
   MainContentView,
@@ -21,6 +22,7 @@ import {
 
 import { render, remove } from 'framework';
 import { generateFilter } from 'mock';
+import { FilterType } from 'const';
 
 const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
@@ -36,6 +38,7 @@ const bodyHideOverflowClass = 'hide-overflow';
 
 export default class ContentPresenter {
   #bodyElement;
+  #siteHeaderElement;
   #siteMainElement;
   #siteFooterElement;
   #statisticsElement;
@@ -58,9 +61,16 @@ export default class ContentPresenter {
   #isPopupOpened = false;
 
   init = (
-    bodyElement, siteMainElement, siteFooterElement, statisticsElement, filmModel, commentModel
+    siteHeaderElement,
+    bodyElement,
+    siteMainElement,
+    siteFooterElement,
+    statisticsElement,
+    filmModel,
+    commentModel
   ) => {
     this.#bodyElement = bodyElement;
+    this.#siteHeaderElement = siteHeaderElement;
     this.#siteMainElement = siteMainElement;
     this.#siteFooterElement = siteFooterElement;
     this.#statisticsElement = statisticsElement;
@@ -68,8 +78,14 @@ export default class ContentPresenter {
     this.#commentModel = commentModel;
     this.#films = [...this.#filmModel.films];
 
-    const filmsCount = this.#films.length;
     const filters = generateFilter(this.#films);
+    const watchedFilmsCount = filters.find((filter) => filter.name === FilterType.HISTORY).count;
+    const filmsCount = this.#films.length;
+
+    if (watchedFilmsCount) {
+      render(new UserRankView(watchedFilmsCount), this.#siteHeaderElement);
+    }
+
     render(new FilterView(filters), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
 
@@ -191,5 +207,3 @@ export default class ContentPresenter {
     this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
   };
 }
-
-
