@@ -1,4 +1,5 @@
 import {
+  UserRankView,
   FilterView,
   SortView,
   MainContentView,
@@ -7,6 +8,7 @@ import {
   FilmItemView,
   ShowMoreButtonView,
   NoFilmsView,
+  FilmsCountView,
   PopupView
 } from 'view';
 
@@ -19,8 +21,10 @@ import {
 } from 'popup';
 
 import { render, remove } from 'framework';
+import { generateFilter } from 'mock';
+import { FilterType } from 'const';
 
-const FILMS_COUNT = 5;
+const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
 const BUTTON_TAG_NAME = 'BUTTON';
 
@@ -34,8 +38,10 @@ const bodyHideOverflowClass = 'hide-overflow';
 
 export default class ContentPresenter {
   #bodyElement;
+  #siteHeaderElement;
   #siteMainElement;
   #siteFooterElement;
+  #statisticsElement;
   #filmModel;
   #commentModel;
   #films;
@@ -54,24 +60,42 @@ export default class ContentPresenter {
   #filmComments;
   #isPopupOpened = false;
 
-  init = (bodyElement, siteMainElement, siteFooterElement, filmModel, commentModel) => {
+  init = (
+    siteHeaderElement,
+    bodyElement,
+    siteMainElement,
+    siteFooterElement,
+    statisticsElement,
+    filmModel,
+    commentModel
+  ) => {
     this.#bodyElement = bodyElement;
+    this.#siteHeaderElement = siteHeaderElement;
     this.#siteMainElement = siteMainElement;
     this.#siteFooterElement = siteFooterElement;
+    this.#statisticsElement = statisticsElement;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
     this.#films = [...this.#filmModel.films];
 
-    render(new FilterView(), this.#siteMainElement);
+    const filters = generateFilter(this.#films);
+    const watchedFilmsCount = filters.find((filter) => filter.name === FilterType.HISTORY).count;
+    const filmsCount = this.#films.length;
+
+    if (watchedFilmsCount) {
+      render(new UserRankView(watchedFilmsCount), this.#siteHeaderElement);
+    }
+
+    render(new FilterView(filters), this.#siteMainElement);
     render(new SortView(), this.#siteMainElement);
 
-    if (!this.#films.length) {
+    if (!filmsCount) {
       render(new NoFilmsView(), this.#filmsListComponent.element);
       render(this.#filmsListComponent, this.#mainContentComponent.element);
     } else {
-      this.#renderFilmsList(this.#films, FILMS_COUNT);
+      this.#renderFilmsList(this.#films, FILMS_STEP_LIMIT);
 
-      if (this.#films.length > FILMS_COUNT) {
+      if (filmsCount > FILMS_STEP_LIMIT) {
         this.#showMoreButtonComponent = new ShowMoreButtonView();
         render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
 
@@ -88,6 +112,7 @@ export default class ContentPresenter {
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
+    render(new FilmsCountView(filmsCount), this.#statisticsElement);
   };
 
   #renderFilmsList = (films, filmsCount, listTitle = null) => {
@@ -112,11 +137,11 @@ export default class ContentPresenter {
     this.#filmsListComponent.element.remove();
 
     this.#films
-      .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_COUNT)
+      .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_STEP_LIMIT)
       .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
 
     render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
-    this.#renderedFilmsCount += FILMS_COUNT;
+    this.#renderedFilmsCount += FILMS_STEP_LIMIT;
 
     if (this.#renderedFilmsCount >= this.#films.length) {
       remove(this.#showMoreButtonComponent);
@@ -182,5 +207,3 @@ export default class ContentPresenter {
     this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
   };
 }
-
-

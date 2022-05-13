@@ -1,7 +1,5 @@
-import { UserRankView, FilmsCountView } from 'view';
 import { ContentPresenter } from 'presenter';
 import { FilmModel, CommentModel } from 'model';
-import { render } from 'framework';
 
 const bodyElement = document.querySelector('body');
 const siteHeaderElement = bodyElement.querySelector('.header');
@@ -13,6 +11,12 @@ const commentModel = new CommentModel();
 const filmModel = new FilmModel();
 const contentPresenter = new ContentPresenter();
 
-render(new UserRankView(), siteHeaderElement);
-contentPresenter.init(bodyElement, siteMainElement, siteFooterElement, filmModel, commentModel);
-render(new FilmsCountView(), statisticsElement);
+contentPresenter.init(
+  siteHeaderElement,
+  bodyElement,
+  siteMainElement,
+  siteFooterElement,
+  statisticsElement,
+  filmModel,
+  commentModel
+);

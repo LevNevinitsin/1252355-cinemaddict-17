@@ -28,7 +28,10 @@ const truncate = (string, maxLength, suffix = '&hellip;') => (
     : string
 );
 
-const pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`;
+const pluralize = (count, noun, renderCount = true, suffix = 's') => {
+  noun += count !== 1 ? suffix : '';
+  return renderCount ? `${count} ${noun}` : noun;
+};
 
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -92,6 +95,8 @@ const getRandomId = (alphabet = '01234567890', length = 10) => {
   return nanoid();
 };
 
+const split3 = (number) => number.toString().split(/(?=(?:...)*$)/).join(' ');
+
 export {
   formatRating,
   getYear,
@@ -105,4 +110,5 @@ export {
   getRandomArrayElement,
   getRandomArrayElements,
   getRandomId,
+  split3,
 };
