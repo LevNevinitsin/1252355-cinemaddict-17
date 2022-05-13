@@ -10,12 +10,12 @@ const filtersNamesMap = {
   [FilterType.FAVORITES]: 'Favorites',
 };
 
-const createFilterItemTemplate = (filter, isAllMovies) => {
+const createFilterTemplate = (filter) => {
   const filterName = filter.name;
   let countElement = `<span class="main-navigation__item-count">${filter.count}</span>`;
   let activeClass = '';
 
-  if (isAllMovies) {
+  if (filterName === FilterType.ALL) {
     countElement = '';
     activeClass = ACTIVE_CLASS;
   }
@@ -27,9 +27,9 @@ const createFilterItemTemplate = (filter, isAllMovies) => {
   );
 };
 
-const createFilterTemplate = (filterItems) => {
+const createFiltersTemplate = (filterItems) => {
   const filterItemsTemplate = filterItems
-    .map((filter, index) => createFilterItemTemplate(filter, index === 0))
+    .map((filter) => createFilterTemplate(filter))
     .join('');
 
   return `<nav class="main-navigation">${filterItemsTemplate}</nav>`;
@@ -44,6 +44,6 @@ export default class FilterView extends AbstractView {
   }
 
   get template() {
-    return createFilterTemplate(this.#filters);
+    return createFiltersTemplate(this.#filters);
   }
 }
