@@ -1,8 +1,26 @@
 import { AbstractView } from 'frameworkView';
 import { formatRating, formatDate, getHumanizedDuration } from 'utils';
+import cn from 'classnames';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
 const popupCloseSelector = '.film-details__close-btn';
+const BUTTON_BASE_CLASS = 'film-details__control-button';
+
+const Modifier = {
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITE: 'favorite',
+  ACTIVE: 'active',
+};
+
+const buttonWatchlistClass = `${BUTTON_BASE_CLASS}--${Modifier.WATCHLIST}`;
+const buttonAlreadyWatchedClass = `${BUTTON_BASE_CLASS}--${Modifier.WATCHED}`;
+const buttonFavoriteClass = `${BUTTON_BASE_CLASS}--${Modifier.FAVORITE}`;
+const buttonActiveClass = `${BUTTON_BASE_CLASS}--${Modifier.ACTIVE}`;
+
+const watchlistButtonSelector = `.${buttonWatchlistClass}`;
+const watchedButtonSelector = `.${buttonAlreadyWatchedClass}`;
+const favoriteButtonSelector = `.${buttonFavoriteClass}`;
 
 const createGenresTemplate = (genres) => (
   genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')
@@ -39,9 +57,18 @@ const createPopupTopContainerTemplate = (film) => {
   const genresCaption = genres.length === 1 ? 'Genre' : 'Genres';
   const genresTemplate = createGenresTemplate(genres);
 
-  const watchlistActiveClassName = isInWatchlist ? 'film-details__control-button--active' : '';
-  const alreadyWatchedActiveClassName = hasAlreadyWatched ? 'film-details__control-button--active' : '';
-  const favoriteActiveClassName = isFavorite ? 'film-details__control-button--active' : '';
+  const watchlistClassName = cn(
+    BUTTON_BASE_CLASS, buttonWatchlistClass, {[buttonActiveClass]: isInWatchlist}
+  );
+
+  const alreadyWatchedClassName = cn(
+    BUTTON_BASE_CLASS, buttonAlreadyWatchedClass, {[buttonActiveClass]: hasAlreadyWatched}
+  );
+
+  const favoriteClassName = cn(
+    BUTTON_BASE_CLASS, buttonFavoriteClass, {[buttonActiveClass]: isFavorite}
+  );
+
 
   return (
     `<div class="film-details__top-container">
@@ -103,9 +130,9 @@ const createPopupTopContainerTemplate = (film) => {
       </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistActiveClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--watched ${alreadyWatchedActiveClassName}" id="watched" name="watched">Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteActiveClassName}" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="${watchlistClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
+        <button type="button" class="${alreadyWatchedClassName}" id="watched" name="watched">Already watched</button>
+        <button type="button" class="${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
       </section>
     </div>`
   );
@@ -128,8 +155,44 @@ export default class PopupTopContainerView extends AbstractView {
     this.element.querySelector(popupCloseSelector).addEventListener('click', this.#clickHandler);
   };
 
+  setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+
+    this.element.querySelector(watchlistButtonSelector)
+      .addEventListener('click', this.#watchlistClickHandler);
+  };
+
+  setWatchedClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+
+    this.element.querySelector(watchedButtonSelector)
+      .addEventListener('click', this.#watchedClickHandler);
+  };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+
+    this.element.querySelector(favoriteButtonSelector)
+      .addEventListener('click', this.#favoriteClickHandler);
+  };
+
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 }

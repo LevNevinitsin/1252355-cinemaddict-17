@@ -125,7 +125,11 @@ export default class FilmPresenter {
   initPopupTopContainer = () => {
     const prevPopupTopContainerComponent = this.#popupTopContainerComponent;
     this.#popupTopContainerComponent = new PopupTopContainerView(this.#film);
+
     this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
+    this.#popupTopContainerComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#popupTopContainerComponent.setWatchedClickHandler(this.#handleWatchedClick);
+    this.#popupTopContainerComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (this.#mode === Mode.DEFAULT) {
       render(this.#popupTopContainerComponent, this.#popupComponent.element);
