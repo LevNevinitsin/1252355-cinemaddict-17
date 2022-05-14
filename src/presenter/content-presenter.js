@@ -80,10 +80,7 @@ export default class ContentPresenter {
       this.#renderFilmsList(this.#films, FILMS_STEP_LIMIT);
 
       if (filmsCount > FILMS_STEP_LIMIT) {
-        this.#showMoreButtonComponent = new ShowMoreButtonView();
-        render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
-
-        this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
+        this.#renderShowMoreButton();
       }
 
       this.#renderFilmsList(
@@ -118,6 +115,12 @@ export default class ContentPresenter {
 
     render(filmsContainerComponent, filmsListComponent.element);
     render(filmsListComponent, this.#mainContentComponent.element);
+  };
+
+  #renderShowMoreButton = () => {
+    this.#showMoreButtonComponent = new ShowMoreButtonView();
+    render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
+    this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
   };
 
   #handleModeChange = () => {
