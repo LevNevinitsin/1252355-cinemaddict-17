@@ -5,28 +5,18 @@ import {
   MainContentView,
   FilmListView,
   FilmsContainerView,
-  FilmItemView,
   ShowMoreButtonView,
   NoFilmsView,
   FilmsCountView,
-  PopupView
 } from 'view';
-
-import {
-  PopupCommentListView,
-  PopupCommentItemView,
-  PopupTopContainerView,
-  PopupBottomContainerView,
-  PopupNewCommentView,
-} from 'popup';
 
 import { render, remove } from 'framework';
 import { generateFilter } from 'mock';
 import { FilterType } from 'const';
+import { FilmPresenter } from 'presenter';
 
 const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
-const BUTTON_TAG_NAME = 'BUTTON';
 
 const RatingDescription = {
   TOP_RATED: 'Top rated',
@@ -34,7 +24,7 @@ const RatingDescription = {
 };
 
 const filmsListRerenderPosition = 'afterbegin';
-const bodyHideOverflowClass = 'hide-overflow';
+
 
 export default class ContentPresenter {
   #bodyElement;
@@ -51,14 +41,7 @@ export default class ContentPresenter {
   #renderedFilmsCount;
   #mainContentComponent = new MainContentView();
 
-  #popupFilm;
-  #popupComponent;
-  #popupCommentListComponent;
-  #popupNewCommentComponent;
-  #popupTopContainerComponent;
-  #popupBottomContainerComponent;
-  #filmComments;
-  #isPopupOpened = false;
+  #filmPresenter = new Map();
 
   init = (
     siteHeaderElement,
@@ -126,11 +109,15 @@ export default class ContentPresenter {
     }
 
     for (let i = 0; i < filmsCount; i++) {
-      this.#renderFilm(films[i], filmsContainerComponent.element);
+      this.#renderFilm(films[i], filmsContainerComponent.element, listTitle);
     }
 
     render(filmsContainerComponent, filmsListComponent.element);
     render(filmsListComponent, this.#mainContentComponent.element);
+  };
+
+  #handleModeChange = () => {
+    this.#filmPresenter.forEach((presenter) => presenter.resetView());
   };
 
   #handleShowMoreButtonClick = () => {
@@ -148,62 +135,17 @@ export default class ContentPresenter {
     }
   };
 
-  #renderFilm = (film, container) => {
-    const filmComponent = new FilmItemView(film);
-
-    filmComponent.setClickHandler((evt) => {
-      if (evt.target.tagName !== BUTTON_TAG_NAME && !this.#isPopupOpened) {
-        this.#openPopup(film.id);
-        this.#isPopupOpened = true;
-      }
-    });
-
-    render(filmComponent, container);
-  };
-
-  #openPopup = (filmId) => {
-    this.#renderPopup(filmId);
-    this.#bodyElement.classList.add(bodyHideOverflowClass);
-    document.addEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #closePopup = () => {
-    remove(this.#popupComponent);
-    this.#bodyElement.classList.remove(bodyHideOverflowClass);
-    this.#isPopupOpened = false;
-  };
-
-  #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#closePopup();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
-    }
-  };
-
-  #renderPopup = (popupFilmId) => {
-    this.#popupFilm = this.#filmModel.getFilm(popupFilmId);
-    this.#popupComponent = new PopupView();
-    this.#popupCommentListComponent = new PopupCommentListView();
-    this.#popupNewCommentComponent = new PopupNewCommentView();
-    this.#popupTopContainerComponent = new PopupTopContainerView(this.#popupFilm);
-    render(this.#popupTopContainerComponent, this.#popupComponent.element);
-
-    this.#popupBottomContainerComponent = new PopupBottomContainerView(
-      this.#popupFilm.commentsIds.length
+  #renderFilm = (film, container, listTitle) => {
+    const filmPresenter = new FilmPresenter(
+      container,
+      this.#bodyElement,
+      this.#siteFooterElement,
+      this.#handleModeChange,
+      this.#filmModel,
+      this.#commentModel
     );
 
-    this.#filmComments = this.#commentModel.getFilmComments(popupFilmId, this.#filmModel);
-
-    this.#filmComments.forEach((comment) => {
-      render(new PopupCommentItemView(comment), this.#popupCommentListComponent.element);
-    });
-
-    render(this.#popupCommentListComponent, this.#popupBottomContainerComponent.element);
-    render(this.#popupNewCommentComponent, this.#popupBottomContainerComponent.element);
-    render(this.#popupBottomContainerComponent, this.#popupComponent.element);
-    render(this.#popupComponent, this.#siteFooterElement, 'afterend');
-
-    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
+    filmPresenter.init(film);
+    this.#filmPresenter.set(`${listTitle ?? ''}_${film.id}`, filmPresenter);
   };
 }
