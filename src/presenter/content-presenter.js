@@ -14,17 +14,18 @@ import { render, remove } from 'framework';
 import { generateFilter } from 'mock';
 import { FilterType } from 'const';
 import { FilmPresenter } from 'presenter';
+import { updateItem } from 'utils';
 
 const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
 
-const RatingDescription = {
+const ListDescription = {
+  MAIN: 'Main',
   TOP_RATED: 'Top rated',
   MOST_COMMENTED: 'Most commented',
 };
 
 const filmsListRerenderPosition = 'afterbegin';
-
 
 export default class ContentPresenter {
   #bodyElement;
@@ -86,11 +87,11 @@ export default class ContentPresenter {
       }
 
       this.#renderFilmsList(
-        this.#filmModel.topRatingFilms, RATING_COUNT, RatingDescription.TOP_RATED
+        this.#filmModel.topRatingFilms, RATING_COUNT, ListDescription.TOP_RATED
       );
 
       this.#renderFilmsList(
-        this.#filmModel.mostCommentedFilms, RATING_COUNT, RatingDescription.MOST_COMMENTED
+        this.#filmModel.mostCommentedFilms, RATING_COUNT, ListDescription.MOST_COMMENTED
       );
     }
 
@@ -108,8 +109,11 @@ export default class ContentPresenter {
       this.#renderedFilmsCount = filmsCount;
     }
 
+    const listType = listTitle ?? ListDescription.MAIN;
+    this.#filmPresenter.set(listType, new Map());
+
     for (let i = 0; i < filmsCount; i++) {
-      this.#renderFilm(films[i], filmsContainerComponent.element, listTitle);
+      this.#renderFilm(films[i], filmsContainerComponent.element, listType);
     }
 
     render(filmsContainerComponent, filmsListComponent.element);
@@ -117,7 +121,20 @@ export default class ContentPresenter {
   };
 
   #handleModeChange = () => {
-    this.#filmPresenter.forEach((presenter) => presenter.resetView());
+    this.#filmPresenter.forEach((listPresentersMap) => {
+      listPresentersMap.forEach((presenter) => presenter.resetView());
+    });
+  };
+
+  #handleFilmChange = (updatedFilm) => {
+    this.#films = updateItem(this.#films, updatedFilm);
+
+    const filmPresenters = Array.from(this.#filmPresenter.values())
+      .map((listPresentersMap) => listPresentersMap.get(updatedFilm.id))
+      .filter((presenter) => presenter);
+
+    filmPresenters.forEach((presenter) => presenter.init(updatedFilm));
+    filmPresenters.find((presenter) => presenter.isOpened())?.initPopupTopContainer();
   };
 
   #handleShowMoreButtonClick = () => {
@@ -135,17 +152,18 @@ export default class ContentPresenter {
     }
   };
 
-  #renderFilm = (film, container, listTitle) => {
+  #renderFilm = (film, container, listType = ListDescription.MAIN) => {
     const filmPresenter = new FilmPresenter(
       container,
       this.#bodyElement,
       this.#siteFooterElement,
       this.#handleModeChange,
+      this.#handleFilmChange,
       this.#filmModel,
       this.#commentModel
     );
 
     filmPresenter.init(film);
-    this.#filmPresenter.set(`${listTitle ?? ''}_${film.id}`, filmPresenter);
+    this.#filmPresenter.get(listType).set(film.id, filmPresenter);
   };
 }

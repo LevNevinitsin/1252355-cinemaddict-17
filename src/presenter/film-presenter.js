@@ -21,7 +21,9 @@ export default class FilmPresenter {
   #container = null;
   #bodyElement = null;
   #siteFooterElement = null;
+
   #changeMode = null;
+  #changeData = null;
   #mode = Mode.DEFAULT;
 
   #film = null;
@@ -36,11 +38,14 @@ export default class FilmPresenter {
   #commentModel = null;
   #filmModel = null;
 
-  constructor(container, bodyElement, siteFooterElement, changeMode, filmModel, commentModel) {
+  constructor(
+    container, bodyElement, siteFooterElement, changeMode, changeData, filmModel, commentModel
+  ) {
     this.#container = container;
     this.#bodyElement = bodyElement;
     this.#siteFooterElement = siteFooterElement;
     this.#changeMode = changeMode;
+    this.#changeData = changeData;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
   }
@@ -49,6 +54,10 @@ export default class FilmPresenter {
     this.#film = film;
     const prevFilmComponent = this.#filmComponent;
     this.#filmComponent = new FilmItemView(film);
+
+    this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#filmComponent.setWatchedClickHandler(this.#handleWatchedClick);
+    this.#filmComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     this.#filmComponent.setClickHandler((evt) => {
       if (evt.target.tagName !== BUTTON_TAG_NAME && this.#mode === Mode.DEFAULT) {
@@ -74,6 +83,23 @@ export default class FilmPresenter {
     }
   };
 
+  isOpened = () => this.#mode === Mode.OPENED;
+
+  #handleWatchlistClick = () => {
+    this.#film.userDetails.watchlist = !this.#film.userDetails.watchlist;
+    this.#changeData(this.#film);
+  };
+
+  #handleWatchedClick = () => {
+    this.#film.userDetails.alreadyWatched = !this.#film.userDetails.alreadyWatched;
+    this.#changeData(this.#film);
+  };
+
+  #handleFavoriteClick = () => {
+    this.#film.userDetails.favorite = !this.#film.userDetails.favorite;
+    this.#changeData(this.#film);
+  };
+
   #openPopup = () => {
     this.#changeMode();
     this.#renderPopup();
@@ -96,12 +122,28 @@ export default class FilmPresenter {
     }
   };
 
+  initPopupTopContainer = () => {
+    const prevPopupTopContainerComponent = this.#popupTopContainerComponent;
+    this.#popupTopContainerComponent = new PopupTopContainerView(this.#film);
+    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
+
+    if (this.#mode === Mode.DEFAULT) {
+      render(this.#popupTopContainerComponent, this.#popupComponent.element);
+      return;
+    }
+
+    if (this.#popupComponent.element.contains(prevPopupTopContainerComponent.element)) {
+      replace(this.#popupTopContainerComponent, prevPopupTopContainerComponent);
+    }
+
+    remove(prevPopupTopContainerComponent);
+  };
+
   #renderPopup = () => {
     this.#popupComponent = new PopupView();
     this.#popupCommentListComponent = new PopupCommentListView();
     this.#popupNewCommentComponent = new PopupNewCommentView();
-    this.#popupTopContainerComponent = new PopupTopContainerView(this.#film);
-    render(this.#popupTopContainerComponent, this.#popupComponent.element);
+    this.initPopupTopContainer();
 
     this.#popupBottomContainerComponent = new PopupBottomContainerView(
       this.#film.commentsIds.length
@@ -117,7 +159,5 @@ export default class FilmPresenter {
     render(this.#popupNewCommentComponent, this.#popupBottomContainerComponent.element);
     render(this.#popupBottomContainerComponent, this.#popupComponent.element);
     render(this.#popupComponent, this.#siteFooterElement, 'afterend');
-
-    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
   };
 }
