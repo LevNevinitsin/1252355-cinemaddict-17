@@ -1,8 +1,16 @@
 import { AbstractView } from 'frameworkView';
 import { formatRating, getYear, getHumanizedDuration, truncate, pluralize } from 'utils';
+import { CallbackName } from 'const';
+import cn from 'classnames';
 
 const MAX_DESCRIPTION_LENGTH = 140;
 const GENRE_DEFAULT_NUMBER = 0;
+
+const BUTTON_BASE_CLASS = 'film-card__controls-item';
+const buttonWatchlistClass = `${BUTTON_BASE_CLASS}--add-to-watchlist`;
+const buttonWatchedClass = `${BUTTON_BASE_CLASS}--mark-as-watched`;
+const buttonFavoriteClass = `${BUTTON_BASE_CLASS}--favorite`;
+const buttonActiveClass = `${BUTTON_BASE_CLASS}--active`;
 
 const createFilmItemTemplate = (film) => {
   const commentsCount = film.commentsIds.length;
@@ -30,9 +38,17 @@ const createFilmItemTemplate = (film) => {
   const descriptionShort = truncate(description, MAX_DESCRIPTION_LENGTH);
   const commentsInfo = pluralize(commentsCount, 'comment');
 
-  const watchlistActiveClassName = isInWatchlist ? 'film-card__controls-item--active' : '';
-  const alreadyWatchedActiveClassName = hasAlreadyWatched ? 'film-card__controls-item--active' : '';
-  const favoriteActiveClassName = isFavorite ? 'film-card__controls-item--active' : '';
+  const watchlistClassName = cn(
+    BUTTON_BASE_CLASS, buttonWatchlistClass, {[buttonActiveClass]: isInWatchlist}
+  );
+
+  const alreadyWatchedClassName = cn(
+    BUTTON_BASE_CLASS, buttonWatchedClass, {[buttonActiveClass]: hasAlreadyWatched}
+  );
+
+  const favoriteClassName = cn(
+    BUTTON_BASE_CLASS, buttonFavoriteClass, {[buttonActiveClass]: isFavorite}
+  );
 
   return (
     `<article class="film-card"">
@@ -49,9 +65,9 @@ const createFilmItemTemplate = (film) => {
         <span class="film-card__comments">${commentsInfo}</span>
       </a>
       <div class="film-card__controls">
-        <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistActiveClassName}" type="button">Add to watchlist</button>
-        <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${alreadyWatchedActiveClassName}" type="button">Mark as watched</button>
-        <button class="film-card__controls-item film-card__controls-item--favorite ${favoriteActiveClassName}" type="button">Mark as favorite</button>
+        <button class="${watchlistClassName}" type="button">Add to watchlist</button>
+        <button class="${alreadyWatchedClassName}" type="button">Mark as watched</button>
+        <button class="${favoriteClassName}" type="button">Mark as favorite</button>
       </div>
     </article>`
   );
@@ -69,13 +85,69 @@ export default class FilmItemView extends AbstractView {
     return createFilmItemTemplate(this.#film);
   }
 
-  setClickHandler = (callback) => {
+  setHandlers = (callbacksMap) => {
+    this.#setClickHandler(callbacksMap[CallbackName.CARD_CLICK]);
+    this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
+    this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
+    this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
+  };
+
+  removeHandlers = () => {
+    this.element.removeEventListener('click', this.#clickHandler);
+
+    this.element.querySelector(`.${buttonWatchlistClass}`)
+      .removeEventListener('click', this.#watchlistClickHandler);
+
+    this.element.querySelector(`.${buttonWatchedClass}`)
+      .removeEventListener('click', this.#watchedClickHandler);
+
+    this.element.querySelector(`.${buttonFavoriteClass}`)
+      .removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.addEventListener('click', this.#clickHandler);
+  };
+
+  #setWatchlistClickHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+
+    this.element.querySelector(`.${buttonWatchlistClass}`)
+      .addEventListener('click', this.#watchlistClickHandler);
+  };
+
+  #setWatchedClickHandler = (callback) => {
+    this._callback.watchedClick = callback;
+
+    this.element.querySelector(`.${buttonWatchedClass}`)
+      .addEventListener('click', this.#watchedClickHandler);
+  };
+
+  #setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+
+    this.element.querySelector(`.${buttonFavoriteClass}`)
+      .addEventListener('click', this.#favoriteClickHandler);
   };
 
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click(evt);
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 }

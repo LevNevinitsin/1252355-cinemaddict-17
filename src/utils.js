@@ -3,6 +3,8 @@ import durationPlugin from 'dayjs/plugin/duration';
 import relativeTimePlugin from 'dayjs/plugin/relativeTime';
 import { customAlphabet } from 'nanoid/non-secure';
 
+const UPDATE_COUNT = 1;
+
 const formatRating = (rating, digitsCount = 1) => rating.toFixed(digitsCount);
 const getYear = (date) => dayjs(date).format('YYYY');
 const formatDate = (date, format) => dayjs(date).format(format);
@@ -97,6 +99,14 @@ const getRandomId = (alphabet = '01234567890', length = 10) => {
 
 const split3 = (number) => number.toString().split(/(?=(?:...)*$)/).join(' ');
 
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index !== -1) {
+    items.splice(index, UPDATE_COUNT, update);
+  }
+};
+
 export {
   formatRating,
   getYear,
@@ -111,4 +121,5 @@ export {
   getRandomArrayElements,
   getRandomId,
   split3,
+  updateItem,
 };

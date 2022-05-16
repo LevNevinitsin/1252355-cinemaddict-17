@@ -5,4 +5,12 @@ const FilterType = {
   FAVORITES: 'favorites',
 };
 
-export { FilterType };
+const CallbackName = {
+  WATCHLIST_CLICK: 'watchlistClick',
+  WATCHED_CLICK: 'watchedClick',
+  FAVORITE_CLICK: 'favoriteClick',
+  CARD_CLICK: 'click',
+  CLOSE_CLICK: 'closeClick',
+};
+
+export { FilterType, CallbackName };
