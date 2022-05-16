@@ -130,7 +130,7 @@ export default class ContentPresenter {
   };
 
   #handleFilmChange = (updatedFilm) => {
-    this.#films = updateItem(this.#films, updatedFilm);
+    updateItem(this.#films, updatedFilm);
 
     const filmPresenters = Array.from(this.#filmPresenter.values())
       .map((listPresentersMap) => listPresentersMap.get(updatedFilm.id))
