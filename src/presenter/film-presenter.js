@@ -15,7 +15,7 @@ const Mode = {
 };
 
 const BUTTON_TAG_NAME = 'BUTTON';
-const bodyHideOverflowClass = 'hide-overflow';
+const BODY_HIDE_OVERFLOW_CLASS = 'hide-overflow';
 
 export default class FilmPresenter {
   #container = null;
@@ -103,14 +103,14 @@ export default class FilmPresenter {
   #openPopup = () => {
     this.#changeMode();
     this.#renderPopup();
-    this.#bodyElement.classList.add(bodyHideOverflowClass);
+    this.#bodyElement.classList.add(BODY_HIDE_OVERFLOW_CLASS);
     document.addEventListener('keydown', this.#onEscKeyDown);
     this.#mode = Mode.OPENED;
   };
 
   #closePopup = () => {
     remove(this.#popupComponent);
-    this.#bodyElement.classList.remove(bodyHideOverflowClass);
+    this.#bodyElement.classList.remove(BODY_HIDE_OVERFLOW_CLASS);
     document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#mode = Mode.DEFAULT;
   };
