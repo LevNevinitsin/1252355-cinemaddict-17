@@ -1,4 +1,4 @@
-import { render, replace, remove } from 'framework';
+import { RenderPosition, render, replace, remove } from 'framework';
 import { FilmItemView, PopupView } from 'view';
 
 import {
@@ -162,6 +162,6 @@ export default class FilmPresenter {
     render(this.#popupCommentListComponent, this.#popupBottomContainerComponent.element);
     render(this.#popupNewCommentComponent, this.#popupBottomContainerComponent.element);
     render(this.#popupBottomContainerComponent, this.#popupComponent.element);
-    render(this.#popupComponent, this.#siteFooterElement, 'afterend');
+    render(this.#popupComponent, this.#siteFooterElement, RenderPosition.AFTEREND);
   };
 }
