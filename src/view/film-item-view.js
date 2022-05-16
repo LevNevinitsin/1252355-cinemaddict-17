@@ -4,23 +4,12 @@ import cn from 'classnames';
 
 const MAX_DESCRIPTION_LENGTH = 140;
 const GENRE_DEFAULT_NUMBER = 0;
+
 const BUTTON_BASE_CLASS = 'film-card__controls-item';
-
-const Modifier = {
-  WATCHLIST: 'add-to-watchlist',
-  WATCHED: 'mark-as-watched',
-  FAVORITE: 'favorite',
-  ACTIVE: 'active',
-};
-
-const buttonWatchlistClass = `${BUTTON_BASE_CLASS}--${Modifier.WATCHLIST}`;
-const buttonAlreadyWatchedClass = `${BUTTON_BASE_CLASS}--${Modifier.WATCHED}`;
-const buttonFavoriteClass = `${BUTTON_BASE_CLASS}--${Modifier.FAVORITE}`;
-const buttonActiveClass = `${BUTTON_BASE_CLASS}--${Modifier.ACTIVE}`;
-
-const watchlistButtonSelector = `.${buttonWatchlistClass}`;
-const watchedButtonSelector = `.${buttonAlreadyWatchedClass}`;
-const favoriteButtonSelector = `.${buttonFavoriteClass}`;
+const buttonWatchlistClass = `${BUTTON_BASE_CLASS}--add-to-watchlist`;
+const buttonWatchedClass = `${BUTTON_BASE_CLASS}--mark-as-watched`;
+const buttonFavoriteClass = `${BUTTON_BASE_CLASS}--favorite`;
+const buttonActiveClass = `${BUTTON_BASE_CLASS}--active`;
 
 const createFilmItemTemplate = (film) => {
   const commentsCount = film.commentsIds.length;
@@ -53,7 +42,7 @@ const createFilmItemTemplate = (film) => {
   );
 
   const alreadyWatchedClassName = cn(
-    BUTTON_BASE_CLASS, buttonAlreadyWatchedClass, {[buttonActiveClass]: hasAlreadyWatched}
+    BUTTON_BASE_CLASS, buttonWatchedClass, {[buttonActiveClass]: hasAlreadyWatched}
   );
 
   const favoriteClassName = cn(
@@ -103,21 +92,21 @@ export default class FilmItemView extends AbstractView {
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
 
-    this.element.querySelector(watchlistButtonSelector)
+    this.element.querySelector(`.${buttonWatchlistClass}`)
       .addEventListener('click', this.#watchlistClickHandler);
   };
 
   setWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
 
-    this.element.querySelector(watchedButtonSelector)
+    this.element.querySelector(`.${buttonWatchedClass}`)
       .addEventListener('click', this.#watchedClickHandler);
   };
 
   setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
 
-    this.element.querySelector(favoriteButtonSelector)
+    this.element.querySelector(`.${buttonFavoriteClass}`)
       .addEventListener('click', this.#favoriteClickHandler);
   };
 
