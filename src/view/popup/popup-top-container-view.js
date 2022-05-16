@@ -4,7 +4,7 @@ import { CallbackName } from 'const';
 import cn from 'classnames';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
-const popupCloseSelector = '.film-details__close-btn';
+const POPUP_CLOSE_SELECTOR = '.film-details__close-btn';
 
 const BUTTON_BASE_CLASS = 'film-details__control-button';
 const buttonWatchlistClass = `${BUTTON_BASE_CLASS}--watchlist`;
@@ -148,7 +148,7 @@ export default class PopupTopContainerView extends AbstractView {
   };
 
   removeHandlers = () => {
-    this.element.querySelector(popupCloseSelector)
+    this.element.querySelector(POPUP_CLOSE_SELECTOR)
       .removeEventListener('click', this.#closeClickHandler);
 
     this.element.querySelector(`.${buttonWatchlistClass}`)
@@ -164,7 +164,7 @@ export default class PopupTopContainerView extends AbstractView {
   #setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
 
-    this.element.querySelector(popupCloseSelector)
+    this.element.querySelector(POPUP_CLOSE_SELECTOR)
       .addEventListener('click', this.#closeClickHandler);
   };
 
