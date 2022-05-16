@@ -38,7 +38,7 @@ export default class FilmPresenter {
   #commentModel = null;
   #filmModel = null;
 
-  constructor(
+  constructor (
     container, bodyElement, siteFooterElement, changeMode, changeData, filmModel, commentModel
   ) {
     this.#container = container;
