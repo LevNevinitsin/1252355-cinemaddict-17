@@ -1,5 +1,6 @@
 import { AbstractView } from 'frameworkView';
 import { formatRating, formatDate, getHumanizedDuration } from 'utils';
+import { CallbackName } from 'const';
 import cn from 'classnames';
 
 const RELEASE_DATE_FORMAT = 'D MMMM YYYY';
@@ -139,35 +140,58 @@ export default class PopupTopContainerView extends AbstractView {
     return createPopupTopContainerTemplate(this.#film);
   }
 
-  setClickHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector(popupCloseSelector).addEventListener('click', this.#clickHandler);
+  setHandlers = (callbacksMap) => {
+    this.#setCloseClickHandler(callbacksMap[CallbackName.CLOSE_CLICK]);
+    this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
+    this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
+    this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
   };
 
-  setWatchlistClickHandler = (callback) => {
+  removeHandlers = () => {
+    this.element.querySelector(popupCloseSelector)
+      .removeEventListener('click', this.#closeClickHandler);
+
+    this.element.querySelector(`.${buttonWatchlistClass}`)
+      .removeEventListener('click', this.#watchlistClickHandler);
+
+    this.element.querySelector(`.${buttonWatchedClass}`)
+      .removeEventListener('click', this.#watchedClickHandler);
+
+    this.element.querySelector(`.${buttonFavoriteClass}`)
+      .removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+
+    this.element.querySelector(popupCloseSelector)
+      .addEventListener('click', this.#closeClickHandler);
+  };
+
+  #setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
 
     this.element.querySelector(`.${buttonWatchlistClass}`)
       .addEventListener('click', this.#watchlistClickHandler);
   };
 
-  setWatchedClickHandler = (callback) => {
+  #setWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
 
     this.element.querySelector(`.${buttonWatchedClass}`)
       .addEventListener('click', this.#watchedClickHandler);
   };
 
-  setFavoriteClickHandler = (callback) => {
+  #setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
 
     this.element.querySelector(`.${buttonFavoriteClass}`)
       .addEventListener('click', this.#favoriteClickHandler);
   };
 
-  #clickHandler = (evt) => {
+  #closeClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.closeClick();
   };
 
   #watchlistClickHandler = (evt) => {

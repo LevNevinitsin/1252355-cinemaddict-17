@@ -1,5 +1,6 @@
 import { RenderPosition, render, replace, remove } from 'framework';
 import { FilmItemView, PopupView } from 'view';
+import { CallbackName } from 'const';
 
 import {
   PopupCommentListView,
@@ -28,6 +29,7 @@ export default class FilmPresenter {
 
   #film = null;
   #filmComponent = null;
+  #callbacksMap = null;
 
   #popupComponent = null;
   #popupCommentListComponent = null;
@@ -48,22 +50,26 @@ export default class FilmPresenter {
     this.#changeData = changeData;
     this.#filmModel = filmModel;
     this.#commentModel = commentModel;
+
+    this.#callbacksMap = {
+      [CallbackName.CARD_CLICK]: (evt) => {
+        if (evt.target.tagName !== BUTTON_TAG_NAME && this.#mode === Mode.DEFAULT) {
+          this.#openPopup();
+        }
+      },
+
+      [CallbackName.WATCHLIST_CLICK]: this.#handleWatchlistClick,
+      [CallbackName.WATCHED_CLICK]: this.#handleWatchedClick,
+      [CallbackName.FAVORITE_CLICK]: this.#handleFavoriteClick,
+      [CallbackName.CLOSE_CLICK]: this.#closePopup,
+    };
   }
 
   init = (film) => {
     this.#film = film;
     const prevFilmComponent = this.#filmComponent;
     this.#filmComponent = new FilmItemView(film);
-
-    this.#filmComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#filmComponent.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#filmComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-
-    this.#filmComponent.setClickHandler((evt) => {
-      if (evt.target.tagName !== BUTTON_TAG_NAME && this.#mode === Mode.DEFAULT) {
-        this.#openPopup();
-      }
-    });
+    this.#filmComponent.setHandlers(this.#callbacksMap);
 
     if (prevFilmComponent === null) {
       render(this.#filmComponent, this.#container);
@@ -74,6 +80,7 @@ export default class FilmPresenter {
       replace(this.#filmComponent, prevFilmComponent);
     }
 
+    prevFilmComponent.removeHandlers();
     remove(prevFilmComponent);
   };
 
@@ -125,11 +132,7 @@ export default class FilmPresenter {
   initPopupTopContainer = () => {
     const prevPopupTopContainerComponent = this.#popupTopContainerComponent;
     this.#popupTopContainerComponent = new PopupTopContainerView(this.#film);
-
-    this.#popupTopContainerComponent.setClickHandler(this.#closePopup);
-    this.#popupTopContainerComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
-    this.#popupTopContainerComponent.setWatchedClickHandler(this.#handleWatchedClick);
-    this.#popupTopContainerComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#popupTopContainerComponent.setHandlers(this.#callbacksMap);
 
     if (this.#mode === Mode.DEFAULT) {
       render(this.#popupTopContainerComponent, this.#popupComponent.element);
@@ -140,6 +143,7 @@ export default class FilmPresenter {
       replace(this.#popupTopContainerComponent, prevPopupTopContainerComponent);
     }
 
+    prevPopupTopContainerComponent.removeHandlers();
     remove(prevPopupTopContainerComponent);
   };
 

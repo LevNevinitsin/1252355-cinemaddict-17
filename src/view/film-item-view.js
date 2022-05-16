@@ -1,5 +1,6 @@
 import { AbstractView } from 'frameworkView';
 import { formatRating, getYear, getHumanizedDuration, truncate, pluralize } from 'utils';
+import { CallbackName } from 'const';
 import cn from 'classnames';
 
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -84,26 +85,46 @@ export default class FilmItemView extends AbstractView {
     return createFilmItemTemplate(this.#film);
   }
 
-  setClickHandler = (callback) => {
+  setHandlers = (callbacksMap) => {
+    this.#setClickHandler(callbacksMap[CallbackName.CARD_CLICK]);
+    this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
+    this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
+    this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
+  };
+
+  removeHandlers = () => {
+    this.element.removeEventListener('click', this.#clickHandler);
+
+    this.element.querySelector(`.${buttonWatchlistClass}`)
+      .removeEventListener('click', this.#watchlistClickHandler);
+
+    this.element.querySelector(`.${buttonWatchedClass}`)
+      .removeEventListener('click', this.#watchedClickHandler);
+
+    this.element.querySelector(`.${buttonFavoriteClass}`)
+      .removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.addEventListener('click', this.#clickHandler);
   };
 
-  setWatchlistClickHandler = (callback) => {
+  #setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
 
     this.element.querySelector(`.${buttonWatchlistClass}`)
       .addEventListener('click', this.#watchlistClickHandler);
   };
 
-  setWatchedClickHandler = (callback) => {
+  #setWatchedClickHandler = (callback) => {
     this._callback.watchedClick = callback;
 
     this.element.querySelector(`.${buttonWatchedClass}`)
       .addEventListener('click', this.#watchedClickHandler);
   };
 
-  setFavoriteClickHandler = (callback) => {
+  #setFavoriteClickHandler = (callback) => {
     this._callback.favoriteClick = callback;
 
     this.element.querySelector(`.${buttonFavoriteClass}`)
