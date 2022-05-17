@@ -25,8 +25,6 @@ const ListDescription = {
   MOST_COMMENTED: 'Most commented',
 };
 
-const filmsListRerenderPosition = 'afterbegin';
-
 export default class ContentPresenter {
   #bodyElement;
   #siteHeaderElement;
@@ -189,7 +187,7 @@ export default class ContentPresenter {
       .slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILMS_STEP_LIMIT)
       .forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
 
-    render(this.#filmsListComponent, this.#mainContentComponent.element, filmsListRerenderPosition);
+    render(this.#filmsListComponent, this.#mainContentComponent.element, RenderPosition.AFTERBEGIN);
     this.#renderedFilmsCount += FILMS_STEP_LIMIT;
 
     if (this.#renderedFilmsCount >= this.#films.length) {
