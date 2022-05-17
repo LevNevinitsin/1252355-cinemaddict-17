@@ -1,6 +1,6 @@
 import { AbstractView } from 'frameworkView';
 
-const extraBlockModificator = 'extra';
+const EXTRA_BLOCK_MODIFICATOR = 'extra';
 
 const createFilmListTemplate = (listTitle) => {
   let modificatorClass = '';
@@ -9,7 +9,7 @@ const createFilmListTemplate = (listTitle) => {
   );
 
   if (listTitle) {
-    modificatorClass = `films-list--${extraBlockModificator}`;
+    modificatorClass = `films-list--${EXTRA_BLOCK_MODIFICATOR}`;
     listTitleTemplate = `<h2 class="films-list__title">${listTitle}</h2>`;
   }
 
