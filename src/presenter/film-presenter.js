@@ -92,6 +92,10 @@ export default class FilmPresenter {
 
   isOpened = () => this.#mode === Mode.OPENED;
 
+  destroy = () => {
+    remove(this.#filmComponent);
+  };
+
   #handleWatchlistClick = () => {
     this.#film.userDetails.watchlist = !this.#film.userDetails.watchlist;
     this.#changeData(this.#film);

@@ -13,4 +13,11 @@ const CallbackName = {
   CLOSE_CLICK: 'closeClick',
 };
 
-export { FilterType, CallbackName };
+const SortType = {
+  DEFAULT: 'default',
+  DATE_DESC: 'date-desc',
+  RATING_DESC: 'rating-desc',
+  COMMENTS_COUNT_DESC: 'comments-count-desc',
+};
+
+export { FilterType, CallbackName, SortType };
