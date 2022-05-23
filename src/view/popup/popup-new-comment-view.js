@@ -5,16 +5,9 @@ const BLANK_COMMENT = {
   emotion: null,
 };
 
-const Emotion = {
-  SMILE: 'smile',
-  SLEEPING: 'sleeping',
-  PUKE: 'puke',
-  ANGRY: 'angry',
-};
-
+const emotions = ['smile', 'sleeping', 'puke', 'angry'];
 const EMOJI_LIST_SELECTOR = '.film-details__emoji-list';
 const TEXTAREA_SELECTOR = '.film-details__comment-input';
-const IMAGE_TAG = 'IMG';
 
 const createChosenEmotionTemplate = (chosenEmotion) => {
   if (!chosenEmotion) {
@@ -29,7 +22,7 @@ const createChosenEmotionTemplate = (chosenEmotion) => {
 };
 
 const createEmojiItems = (chosenEmotion) => (
-  Object.values(Emotion).map((emotion) => {
+  emotions.map((emotion) => {
     const checked = chosenEmotion === emotion ? 'checked' : '';
 
     return (
@@ -41,23 +34,20 @@ const createEmojiItems = (chosenEmotion) => (
   }).join('')
 );
 
-const createPopupNewCommentTemplate = (data) => {
-  const chosenEmotion = data.emotion;
+const createPopupNewCommentTemplate = ({emotion, comment}) => (
+  `<div class="film-details__new-comment">
+    ${createChosenEmotionTemplate(emotion)}
 
-  return (
-    `<div class="film-details__new-comment">
-      ${createChosenEmotionTemplate(chosenEmotion)}
+    <label class="film-details__comment-label">
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
+    </label>
 
-      <label class="film-details__comment-label">
-        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${data.comment}</textarea>
-      </label>
+    <div class="film-details__emoji-list">
+      ${createEmojiItems(emotion)}
+    </div>
+  </div>`
+);
 
-      <div class="film-details__emoji-list">
-        ${createEmojiItems(chosenEmotion)}
-      </div>
-    </div>`
-  );
-};
 
 export default class PopupNewCommentView extends AbstractStatefulView {
   constructor (comment = BLANK_COMMENT) {
@@ -82,22 +72,17 @@ export default class PopupNewCommentView extends AbstractStatefulView {
     });
   };
 
-  #emojiClickHandler = (evt) => {
+  #emojiChangeHandler = (evt) => {
     evt.preventDefault();
-    const evtTarget = evt.target;
 
-    if (evtTarget.tagName === IMAGE_TAG) {
-      const input = evtTarget.parentNode.previousElementSibling;
-
-      this.updateElement({
-        emotion: input.value,
-      });
-    }
+    this.updateElement({
+      emotion: evt.target.value,
+    });
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector(EMOJI_LIST_SELECTOR)
-      .addEventListener('click', this.#emojiClickHandler);
+      .addEventListener('change', this.#emojiChangeHandler);
 
     this.element.querySelector(TEXTAREA_SELECTOR)
       .addEventListener('input', this.#textInputHandler);
