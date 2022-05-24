@@ -92,7 +92,7 @@ const getRandomArrayElements = (
   return result;
 };
 
-const getRandomId = (alphabet = '01234567890', length = 10) => {
+const getRandomId = (alphabet = '0123456789', length = 10) => {
   const nanoid = customAlphabet(alphabet, length);
   return nanoid();
 };
