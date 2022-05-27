@@ -1,5 +1,8 @@
 import { AbstractView } from 'frameworkView';
 import { getRelativeTime } from 'utils';
+import { UserAction, UpdateType } from 'const';
+
+const DELETE_BUTTON_SELECTOR = '.film-details__comment-delete';
 
 const createPopupCommentItemTemplate = (comment) => {
   const {
@@ -39,4 +42,17 @@ export default class PopupCommentItemView extends AbstractView {
   get template() {
     return createPopupCommentItemTemplate(this.#comment);
   }
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+
+    this.element
+      .querySelector(DELETE_BUTTON_SELECTOR)
+      .addEventListener('click', this.#deleteClickHandler);
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(UserAction.DELETE_COMMENT, UpdateType.MINOR, this.#comment);
+  };
 }
