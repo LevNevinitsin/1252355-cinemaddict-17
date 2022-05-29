@@ -1,5 +1,5 @@
 import { AbstractStatefulView } from 'frameworkView';
-import { UserAction, UpdateType } from 'const';
+import { UserAction, UpdateType, CallbackName } from 'const';
 
 const ENTER_KEY_VALUE = 'Enter';
 
@@ -63,7 +63,15 @@ export default class PopupNewCommentView extends AbstractStatefulView {
     return createPopupNewCommentTemplate(this._state);
   }
 
-  setCtrlEnterKeydownHandler = (callback) => {
+  setHandlers = (callbacksMap) => {
+    this.#setCtrlEnterKeydownHandler(callbacksMap[CallbackName.CTRL_ENTER_KEYDOWN]);
+  };
+
+  removeHandlers = () => {
+    document.removeEventListener('keydown', this.#ctrlEnterKeydownHandler);
+  };
+
+  #setCtrlEnterKeydownHandler = (callback) => {
     this._callback.ctrlEnterKeydown = callback;
     document.addEventListener('keydown', this.#ctrlEnterKeydownHandler);
   };
@@ -101,7 +109,8 @@ export default class PopupNewCommentView extends AbstractStatefulView {
       evt.preventDefault();
 
       if (this._state.comment && this._state.emotion) {
-        this._callback.ctrlEnterKeydown(UserAction.ADD_COMMENT, UpdateType.MINOR, this._state);
+
+        this._callback.ctrlEnterKeydown(UserAction.ADD_COMMENT, UpdateType.MAJOR, this._state);
       }
     }
   };

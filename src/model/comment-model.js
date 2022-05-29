@@ -8,16 +8,15 @@ export default class CommentModel extends Observable {
   #filmModel = null;
   #comments = null;
 
-  constructor(filmId, filmModel) {
-    super();
-    this.#filmId = filmId;
-    this.#filmModel = filmModel;
-    this.#comments = generateComments(this.#filmModel.getFilm(this.#filmId).commentsIds);
-  }
-
   get comments() {
     return this.#comments;
   }
+
+  loadComments = (filmId, filmModel) => {
+    this.#filmId = filmId;
+    this.#filmModel = filmModel;
+    this.#comments = generateComments(this.#filmModel.getFilm(this.#filmId).commentsIds);
+  };
 
   addComment = (updateType, update) => {
     this.#comments = [

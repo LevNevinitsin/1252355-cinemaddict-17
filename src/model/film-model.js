@@ -3,7 +3,7 @@ import { generateFilms } from 'mock';
 import { SortType } from 'const';
 import dayjs from 'dayjs';
 
-const FILMS_COUNT = 13;
+const FILMS_COUNT = 23;
 const RATING_COUNT = 2;
 const UPDATE_COUNT = 1;
 
@@ -22,9 +22,11 @@ export default class FilmModel extends Observable {
   constructor() {
     super();
     this.#films = generateFilms(FILMS_COUNT);
-    this.topRatingFilms = this.getFilmsSortedBy(SortType.RATING_DESC).slice(0, RATING_COUNT);
 
-    this.mostCommentedFilms = this.getFilmsSortedBy(SortType.COMMENTS_COUNT_DESC)
+    this.topRatingFilms = FilmModel.sortFilms(this.#films, SortType.RATING_DESC)
+      .slice(0, RATING_COUNT);
+
+    this.mostCommentedFilms = FilmModel.sortFilms(this.#films, SortType.COMMENTS_COUNT_DESC)
       .slice(0, RATING_COUNT);
   }
 
@@ -33,7 +35,7 @@ export default class FilmModel extends Observable {
   }
 
   getFilm = (filmId) => this.#films.find((film) => film.id === filmId);
-  getFilmsSortedBy = (sortType) => [...this.#films].sort(sortCallbacksMap[sortType]);
+  static sortFilms = (films, sortType) => [...films].sort(sortCallbacksMap[sortType]);
 
   updateFilm = (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);

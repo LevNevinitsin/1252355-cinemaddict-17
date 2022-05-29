@@ -11,6 +11,7 @@ const CallbackName = {
   FAVORITE_CLICK: 'favoriteClick',
   CARD_CLICK: 'click',
   CLOSE_CLICK: 'closeClick',
+  CTRL_ENTER_KEYDOWN: 'ctrlEnterKeydown',
 };
 
 const SortType = {

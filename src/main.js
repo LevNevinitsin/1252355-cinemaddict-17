@@ -1,5 +1,5 @@
 import { ContentPresenter } from 'presenter';
-import { FilmModel } from 'model';
+import { FilmModel, FilterModel } from 'model';
 
 const bodyElement = document.querySelector('body');
 const siteHeaderElement = bodyElement.querySelector('.header');
@@ -8,6 +8,7 @@ const siteFooterElement = bodyElement.querySelector('.footer');
 const statisticsElement = siteFooterElement.querySelector('.footer__statistics');
 
 const filmModel = new FilmModel();
+const filterModel = new FilterModel();
 const contentPresenter = new ContentPresenter();
 
 contentPresenter.init(
@@ -17,4 +18,5 @@ contentPresenter.init(
   siteFooterElement,
   statisticsElement,
   filmModel,
+  filterModel,
 );
