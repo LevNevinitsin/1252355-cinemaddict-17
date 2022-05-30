@@ -102,12 +102,10 @@ export default class PopupPresenter {
   #handleModelEvent = (updateType) => {
     switch (updateType) {
       case UpdateType.MINOR:
-        this.#clearCommentsSection();
-        this.#renderCommentsSection();
+        this.#refreshCommentsSection();
         break;
       case UpdateType.MAJOR:
-        this.#clearCommentsSection();
-        this.#renderCommentsSection();
+        this.#refreshCommentsSection();
         this.#clearNewCommentSection();
         this.#renderNewCommentSection();
         break;
@@ -146,11 +144,6 @@ export default class PopupPresenter {
     remove(this.#popupTopContainerComponent);
   };
 
-  #clearCommentsSection = () => {
-    remove(this.#popupCommentsCountComponent);
-    remove(this.#popupCommentListComponent);
-  };
-
   #renderCommentsSection = () => {
     this.#popupCommentsCountComponent = new PopupCommentsCountView(
       this.#commentModel.comments.length
@@ -178,15 +171,25 @@ export default class PopupPresenter {
     );
   };
 
-  #clearNewCommentSection = () => {
-    remove(this.#popupNewCommentComponent);
-    this.#popupNewCommentComponent.removeHandlers();
+  #clearCommentsSection = () => {
+    remove(this.#popupCommentsCountComponent);
+    remove(this.#popupCommentListComponent);
+  };
+
+  #refreshCommentsSection = () => {
+    this.#clearCommentsSection();
+    this.#renderCommentsSection();
   };
 
   #renderNewCommentSection = () => {
     this.#popupNewCommentComponent = new PopupNewCommentView();
     render(this.#popupNewCommentComponent, this.#popupBottomContainerComponent.element);
     this.#popupNewCommentComponent.setHandlers(this.#callbacksMap);
+  };
+
+  #clearNewCommentSection = () => {
+    remove(this.#popupNewCommentComponent);
+    this.#popupNewCommentComponent.removeHandlers();
   };
 
   #renderPopup = () => {

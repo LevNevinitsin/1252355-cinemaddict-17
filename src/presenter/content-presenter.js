@@ -144,10 +144,10 @@ export default class ContentPresenter {
     );
   };
 
-  #renderMainList = (resetRenderedFilmsCount) => {
+  #renderMainList = (resetRenderedFilmsCount = true) => {
     const films = this.films;
     const filmsCount = films.length;
-    const renderedStepsCount = Math.ceil(this.#renderedFilmsCount / FILMS_STEP_LIMIT);
+    let renderedStepsCount;
     let filmsToRenderCount;
 
     if (!filmsCount) {
@@ -158,6 +158,7 @@ export default class ContentPresenter {
     if (resetRenderedFilmsCount) {
       filmsToRenderCount = FILMS_STEP_LIMIT;
     } else {
+      renderedStepsCount = Math.ceil(this.#renderedFilmsCount / FILMS_STEP_LIMIT);
       const stepsToRenderCount = Math.ceil(filmsCount / FILMS_STEP_LIMIT);
 
       if (renderedStepsCount === stepsToRenderCount && filmsCount > this.#renderedFilmsCount) {
@@ -170,12 +171,16 @@ export default class ContentPresenter {
     this.#renderSort();
     this.#renderFilmsList(films, filmsToRenderCount);
 
-    if (filmsCount > renderedStepsCount * FILMS_STEP_LIMIT) {
+    const threshold = resetRenderedFilmsCount
+      ? FILMS_STEP_LIMIT
+      : renderedStepsCount * FILMS_STEP_LIMIT;
+
+    if (filmsCount > threshold) {
       this.#renderShowMoreButton();
     }
   };
 
-  #clearMainList = (resetSortType) => {
+  #clearMainList = (resetSortType = false) => {
     if (this.#sortComponent) {
       remove(this.#sortComponent);
     }
@@ -195,9 +200,9 @@ export default class ContentPresenter {
     }
   };
 
-  #refreshMainList = ({resetRenderedFilmsCount = true, resetSortType = false} = {}) => {
-    this.#clearMainList(resetRenderedFilmsCount);
-    this.#renderMainList(resetSortType);
+  #refreshMainList = ({resetSortType = false, resetRenderedFilmsCount = true} = {}) => {
+    this.#clearMainList(resetSortType);
+    this.#renderMainList(resetRenderedFilmsCount);
   };
 
   #renderFilmsList = (films, filmsCount, listTitle = null) => {
@@ -305,7 +310,7 @@ export default class ContentPresenter {
 
     films.forEach((film) => this.#renderFilm(film, this.#filmsContainerComponent.element));
     render(this.#filmsListComponent, this.#mainContentComponent.element, RenderPosition.AFTERBEGIN);
-    this.#renderedFilmsCount += FILMS_STEP_LIMIT;
+    this.#renderedFilmsCount = newRenderedFilmsCount;
 
     if (this.#renderedFilmsCount >= filmsCount) {
       remove(this.#showMoreButtonComponent);
