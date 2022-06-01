@@ -4,7 +4,6 @@ import { SortType } from 'const';
 import dayjs from 'dayjs';
 
 const FILMS_COUNT = 23;
-const RATING_COUNT = 2;
 const UPDATE_COUNT = 1;
 
 const sortCallbacksMap = {
@@ -22,12 +21,6 @@ export default class FilmModel extends Observable {
   constructor() {
     super();
     this.#films = generateFilms(FILMS_COUNT);
-
-    this.topRatingFilms = FilmModel.sortFilms(this.#films, SortType.RATING_DESC)
-      .slice(0, RATING_COUNT);
-
-    this.mostCommentedFilms = FilmModel.sortFilms(this.#films, SortType.COMMENTS_COUNT_DESC)
-      .slice(0, RATING_COUNT);
   }
 
   get films() {

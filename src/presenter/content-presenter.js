@@ -93,13 +93,8 @@ export default class ContentPresenter {
     const totalFilmsCount = this.#filmModel.films.length;
 
     if (totalFilmsCount) {
-      this.#renderFilmsList(
-        this.#filmModel.topRatingFilms, RATING_COUNT, ListDescription.TOP_RATED
-      );
-
-      this.#renderFilmsList(
-        this.#filmModel.mostCommentedFilms, RATING_COUNT, ListDescription.MOST_COMMENTED
-      );
+      this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
+      this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
@@ -247,6 +242,14 @@ export default class ContentPresenter {
     this.#showMoreButtonComponent = new ShowMoreButtonView();
     render(this.#showMoreButtonComponent, this.#filmsListComponent.element);
     this.#showMoreButtonComponent.setClickHandler(this.#handleShowMoreButtonClick);
+  };
+
+  #renderRatingList = (listType, sortType) => {
+    this.ratingFilms = FilmModel.sortFilms(this.#filmModel.films, sortType).slice(0, RATING_COUNT);
+
+    this.#renderFilmsList(
+      this.ratingFilms, RATING_COUNT, listType
+    );
   };
 
   #handleViewAction = (actionType, updateType, update) => {
