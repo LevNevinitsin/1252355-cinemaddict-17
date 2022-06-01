@@ -1,4 +1,7 @@
 import { AbstractStatefulView } from 'frameworkView';
+import { UserAction, UpdateType, CallbackName } from 'const';
+
+const ENTER_KEY_VALUE = 'Enter';
 
 const BLANK_COMMENT = {
   comment: '',
@@ -60,6 +63,19 @@ export default class PopupNewCommentView extends AbstractStatefulView {
     return createPopupNewCommentTemplate(this._state);
   }
 
+  setHandlers = (callbacksMap) => {
+    this.#setCtrlEnterKeydownHandler(callbacksMap[CallbackName.CTRL_ENTER_KEYDOWN]);
+  };
+
+  removeHandlers = () => {
+    document.removeEventListener('keydown', this.#ctrlEnterKeydownHandler);
+  };
+
+  #setCtrlEnterKeydownHandler = (callback) => {
+    this._callback.ctrlEnterKeydown = callback;
+    document.addEventListener('keydown', this.#ctrlEnterKeydownHandler);
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
   };
@@ -86,6 +102,16 @@ export default class PopupNewCommentView extends AbstractStatefulView {
 
     this.element.querySelector(TEXTAREA_SELECTOR)
       .addEventListener('input', this.#textInputHandler);
+  };
+
+  #ctrlEnterKeydownHandler = (evt) => {
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === ENTER_KEY_VALUE) {
+      evt.preventDefault();
+
+      if (this._state.comment && this._state.emotion) {
+        this._callback.ctrlEnterKeydown(UserAction.ADD_COMMENT, UpdateType.MAJOR, this._state);
+      }
+    }
   };
 
   static parseCommentToState = (comment) => ({...comment});

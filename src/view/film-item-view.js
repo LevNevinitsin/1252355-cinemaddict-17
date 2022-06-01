@@ -86,7 +86,6 @@ export default class FilmItemView extends AbstractView {
   }
 
   setHandlers = (callbacksMap) => {
-    this.#setClickHandler(callbacksMap[CallbackName.CARD_CLICK]);
     this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
     this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
     this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
@@ -105,7 +104,7 @@ export default class FilmItemView extends AbstractView {
       .removeEventListener('click', this.#favoriteClickHandler);
   };
 
-  #setClickHandler = (callback) => {
+  setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.addEventListener('click', this.#clickHandler);
   };

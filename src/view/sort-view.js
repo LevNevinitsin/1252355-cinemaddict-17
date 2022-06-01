@@ -1,19 +1,45 @@
 import { AbstractView } from 'frameworkView';
 import { SortType } from 'const';
+import cn from 'classnames';
 
 const ANCHOR_TAG = 'A';
+const SORT_BUTTON_BASE_CLASS = 'sort__button';
+const SORT_BUTTON_ACTIVE_CLASS = 'sort__button--active';
 
-const createSortTemplate = () => (
-  `<ul class="sort">
-    <li><a href="#" class="sort__button sort__button--active" data-sort-type="${SortType.DEFAULT}">Sort by default</a></li>
-    <li><a href="#" class="sort__button" data-sort-type="${SortType.DATE_DESC}">Sort by date</a></li>
-    <li><a href="#" class="sort__button" data-sort-type="${SortType.RATING_DESC}">Sort by rating</a></li>
-  </ul>`
-);
+const sortButtonsMap = {
+  [SortType.DEFAULT]: 'Sort by default',
+  [SortType.DATE_DESC]: 'Sort by date',
+  [SortType.RATING_DESC]: 'Sort by rating',
+};
+
+const createSortButtonTemplate = (currentSortType, sortType, sortTitle) => {
+  const className = cn(
+    SORT_BUTTON_BASE_CLASS, { [SORT_BUTTON_ACTIVE_CLASS]: currentSortType === sortType }
+  );
+
+  return (
+    `<li><a href="#" class="${className}" data-sort-type="${sortType}">${sortTitle}</a></li>`
+  );
+};
+
+const createSortTemplate = (currentSortType) => {
+  const sortButtonsTemplate = Object.entries(sortButtonsMap)
+    .map(([sortType, sortTitle]) => createSortButtonTemplate(currentSortType, sortType, sortTitle))
+    .join('');
+
+  return `<ul class="sort">${sortButtonsTemplate}</ul>`;
+};
 
 export default class SortView extends AbstractView {
+  #currentSortType = null;
+
+  constructor(currentSortType) {
+    super();
+    this.#currentSortType = currentSortType;
+  }
+
   get template() {
-    return createSortTemplate();
+    return createSortTemplate(this.#currentSortType);
   }
 
   setSortTypeChangeHandler = (callback) => {
