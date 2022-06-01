@@ -19,7 +19,7 @@ export default class FilterPresenter {
   }
 
   get filtersMap() {
-    const films = this.#filmModel.films;
+    const { films } = this.#filmModel;
 
     return {
       [FilterType.ALL]: {
