@@ -28,6 +28,7 @@ export default class FilmModel extends Observable {
   }
 
   getFilm = (filmId) => this.#films.find((film) => film.id === filmId);
+
   static sortFilms = (films, sortType) => [...films].sort(sortCallbacksMap[sortType]);
 
   updateFilm = (updateType, update) => {
