@@ -228,7 +228,7 @@ export default class ContentPresenter {
     this.#filmPresenter.get(listType).set(film.id, filmPresenter);
 
     filmPresenter.filmComponent.setClickHandler((evt) => {
-      if (this.#popupPresenter?.filmId === film.id) {
+      if (this.#popupPresenter.isOpened() && this.#popupPresenter.filmId === film.id) {
         return;
       }
 

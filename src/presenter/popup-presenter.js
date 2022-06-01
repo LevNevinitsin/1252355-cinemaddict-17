@@ -58,7 +58,7 @@ export default class PopupPresenter {
   }
 
   get filmId() {
-    return this.#film?.id;
+    return this.#film.id;
   }
 
   init = (film) => {
