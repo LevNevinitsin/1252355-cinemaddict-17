@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
 import relativeTimePlugin from 'dayjs/plugin/relativeTime';
-import { customAlphabet } from 'nanoid/non-secure';
 
 const formatRating = (rating, digitsCount = 1) => rating.toFixed(digitsCount);
 const getYear = (date) => dayjs(date).format('YYYY');
