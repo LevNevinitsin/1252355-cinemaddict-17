@@ -94,7 +94,7 @@ export default class ContentPresenter {
     render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
 
     this.#popupPresenter = new PopupPresenter(
-      this.#siteFooterElement, this.#bodyElement, this.#filmModel, this.#handleViewAction
+      this.#siteFooterElement, this.#bodyElement, this.#handleViewAction
     );
   };
 
