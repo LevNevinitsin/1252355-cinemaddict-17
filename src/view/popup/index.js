@@ -5,3 +5,4 @@ export { default as PopupNewCommentView } from './popup-new-comment-view.js';
 export { default as PopupTopContainerView } from './popup-top-container-view.js';
 export { default as PopupCommentsCountView } from './popup-comments-count-view.js';
 export { default as PopupFormView } from './popup-form-view.js';
+export { default as PopupLoadingView } from './popup-loading-view.js';

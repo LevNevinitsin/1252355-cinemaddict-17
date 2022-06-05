@@ -7,6 +7,7 @@ import {
   ShowMoreButtonView,
   NoFilmsView,
   FilmsCountView,
+  LoadingView,
 } from 'view';
 
 import { RenderPosition, render, remove } from 'framework';
@@ -41,6 +42,7 @@ export default class ContentPresenter {
   #noFilmsComponent;
   #showMoreButtonComponent;
   #mainContentComponent = new MainContentView();
+  #loadingComponent = new LoadingView();
 
   #filmPresenter = new Map();
   #filterPresenter = null;
@@ -49,6 +51,7 @@ export default class ContentPresenter {
   #filterType = FilterType.ALL;
   #currentSortType = SortType.DEFAULT;
   #renderedFilmsCount;
+  #isLoading = true;
 
   get films() {
     this.#filterType = this.#filterModel.filter;
@@ -87,22 +90,29 @@ export default class ContentPresenter {
     this.#filmModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
 
+    this.#renderContent();
+    render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
+
+    this.#popupPresenter = new PopupPresenter(
+      this.#siteFooterElement, this.#bodyElement, this.#filmModel, this.#handleViewAction
+    );
+  };
+
+  #renderContent = () => {
     this.#renderRank();
     this.#renderMainList();
 
-    const totalFilmsCount = this.#filmModel.films.length;
-
-    if (totalFilmsCount) {
+    if (this.#filmModel.films.length && !this.#isLoading) {
       this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
       this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
-    render(new FilmsCountView(totalFilmsCount), this.#statisticsElement);
+  };
 
-    this.#popupPresenter = new PopupPresenter(
-      this.#siteFooterElement, this.#bodyElement, this.#filmModel, this.#handleViewAction
-    );
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#filmsListComponent.element);
+    render(this.#filmsListComponent, this.#mainContentComponent.element, RenderPosition.AFTERBEGIN);
   };
 
   #renderRank = () => {
@@ -145,6 +155,11 @@ export default class ContentPresenter {
     let renderedStepsCount;
     let filmsToRenderCount;
 
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (!filmsCount) {
       this.#renderNoFilms();
       return;
@@ -176,6 +191,10 @@ export default class ContentPresenter {
   };
 
   #clearMainList = (resetSortType = false) => {
+    if (this.#loadingComponent) {
+      remove(this.#loadingComponent);
+    }
+
     if (this.#sortComponent) {
       remove(this.#sortComponent);
     }
@@ -282,6 +301,11 @@ export default class ContentPresenter {
         break;
       case UpdateType.MAJOR:
         this.#refreshMainList({resetSortType: true});
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderContent();
         break;
     }
   };

@@ -1,21 +1,32 @@
 import { Observable } from 'framework';
-import { generateComments } from 'mock';
+import { UpdateType } from 'const';
 
 const UPDATE_COUNT = 1;
 
 export default class CommentModel extends Observable {
+  #commentsApiService = null;
   #filmId = null;
-  #filmModel = null;
   #comments = null;
+
+  constructor(commentsApiService) {
+    super();
+    this.#commentsApiService = commentsApiService;
+  }
 
   get comments() {
     return this.#comments;
   }
 
-  loadComments = (filmId, filmModel) => {
+  loadComments = async (filmId) => {
     this.#filmId = filmId;
-    this.#filmModel = filmModel;
-    this.#comments = generateComments(this.#filmModel.getFilm(this.#filmId).commentsIds);
+
+    try {
+      this.#comments = await this.#commentsApiService.getComments(this.#filmId);
+    } catch(err) {
+      this.#comments = [];
+    }
+
+    this._notify(UpdateType.INIT);
   };
 
   addComment = (updateType, update) => {

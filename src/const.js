@@ -30,7 +30,12 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
+  SUPERMINOR: 'SUPERMINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
-export { FilterType, CallbackName, SortType, UserAction, UpdateType };
+const AUTHORIZATION = 'Basic jf758urifhj';
+const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
+
+export { FilterType, CallbackName, SortType, UserAction, UpdateType, AUTHORIZATION, END_POINT };
