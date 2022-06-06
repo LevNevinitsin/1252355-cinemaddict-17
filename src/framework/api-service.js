@@ -1,3 +1,5 @@
+import { isPlainObject } from 'lodash';
+
 /**
  * Класс для отправки запросов к серверу
  */
@@ -65,4 +67,12 @@ export default class ApiService {
   static catchError = (err) => {
     throw err;
   };
+
+  static adaptCase = (object, callback) => (
+    Object.fromEntries(
+      Object.entries(object).map(([key, value]) => (
+        [callback(key), isPlainObject(value) ? ApiService.adaptCase(value, callback) : value])
+      )
+    )
+  );
 }
