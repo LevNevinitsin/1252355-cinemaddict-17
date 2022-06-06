@@ -1,10 +1,6 @@
 import { ApiService } from 'framework';
 import { snakeCase, camelCase } from 'lodash';
-
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
+import { Method } from 'const';
 
 const RESOURCE_ADDRESS = 'movies';
 

@@ -38,4 +38,13 @@ const UpdateType = {
 const AUTHORIZATION = 'Basic jf758urifhj';
 const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
 
-export { FilterType, CallbackName, SortType, UserAction, UpdateType, AUTHORIZATION, END_POINT };
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+export {
+  FilterType, CallbackName, SortType, UserAction, UpdateType, AUTHORIZATION, END_POINT, Method
+};
