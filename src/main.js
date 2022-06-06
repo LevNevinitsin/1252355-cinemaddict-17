@@ -1,5 +1,7 @@
 import { ContentPresenter } from 'presenter';
 import { FilmModel, FilterModel } from 'model';
+import { AUTHORIZATION, END_POINT } from 'const';
+import FilmsApiService from './films-api-service.js';
 
 const bodyElement = document.querySelector('body');
 const siteHeaderElement = bodyElement.querySelector('.header');
@@ -7,7 +9,7 @@ const siteMainElement = bodyElement.querySelector('.main');
 const siteFooterElement = bodyElement.querySelector('.footer');
 const statisticsElement = siteFooterElement.querySelector('.footer__statistics');
 
-const filmModel = new FilmModel();
+const filmModel = new FilmModel(new FilmsApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
 const contentPresenter = new ContentPresenter();
 
@@ -20,3 +22,5 @@ contentPresenter.init(
   filmModel,
   filterModel,
 );
+
+filmModel.init();

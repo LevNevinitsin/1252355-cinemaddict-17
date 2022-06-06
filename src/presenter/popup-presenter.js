@@ -1,7 +1,8 @@
 import { RenderPosition, render, replace, remove } from 'framework';
 import { CommentModel } from 'model';
 import { PopupView } from 'view';
-import { CallbackName, UserAction, UpdateType } from 'const';
+import { CallbackName, UserAction, UpdateType, AUTHORIZATION, END_POINT } from 'const';
+import CommentsApiService from '../comments-api-service.js';
 
 import {
   PopupFormView,
@@ -11,6 +12,7 @@ import {
   PopupBottomContainerView,
   PopupNewCommentView,
   PopupCommentsCountView,
+  PopupLoadingView,
 } from 'popup';
 
 const BODY_HIDE_OVERFLOW_CLASS = 'hide-overflow';
@@ -25,7 +27,6 @@ export default class PopupPresenter {
   #bodyElement = null;
   #film = null;
   #callbacksMap = null;
-  #filmModel = null;
   #changeData = null;
 
   #popupComponent = null;
@@ -35,17 +36,18 @@ export default class PopupPresenter {
   #popupTopContainerComponent = null;
   #popupBottomContainerComponent = null;
   #popupCommentsCountComponent;
+  #popupLoadingComponent = new PopupLoadingView();
   #commentModel = null;
 
   #mode = Mode.DEFAULT;
   #commentComponent = new Map();
+  #isLoading = true;
 
-  constructor(container, bodyElement, filmModel, changeData) {
+  constructor(container, bodyElement, changeData) {
     this.#container = container;
     this.#bodyElement = bodyElement;
-    this.#filmModel = filmModel;
     this.#changeData = changeData;
-    this.#commentModel = new CommentModel();
+    this.#commentModel = new CommentModel(new CommentsApiService(END_POINT, AUTHORIZATION));
     this.#commentModel.addObserver(this.#handleModelEvent);
 
     this.#callbacksMap = {
@@ -63,10 +65,11 @@ export default class PopupPresenter {
 
   init = (film) => {
     this.#film = film;
-    this.#commentModel.loadComments(this.#film.id, this.#filmModel);
+    this.#commentModel.loadComments(this.#film.id);
     const prevPopupComponent = this.#popupComponent;
 
     this.#popupNewCommentComponent?.removeHandlers();
+    this.#isLoading = true;
     this.#renderPopup();
     this.#mode = Mode.OPENED;
 
@@ -109,6 +112,11 @@ export default class PopupPresenter {
         this.#clearNewCommentSection();
         this.#renderNewCommentSection();
         break;
+      case  UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#popupLoadingComponent);
+        this.#renderCommentsSection();
+        break;
     }
   };
 
@@ -128,6 +136,10 @@ export default class PopupPresenter {
     }
   };
 
+  #renderLoading = () => {
+    render(this.#popupLoadingComponent, this.#popupBottomContainerComponent.element);
+  };
+
   #renderPopupTopContainer = () => {
     this.#popupTopContainerComponent = new PopupTopContainerView(this.#film);
     this.#popupTopContainerComponent.setHandlers(this.#callbacksMap);
@@ -145,6 +157,11 @@ export default class PopupPresenter {
   };
 
   #renderCommentsSection = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     this.#popupCommentsCountComponent = new PopupCommentsCountView(
       this.#commentModel.comments.length
     );

@@ -37,7 +37,6 @@ module.exports = {
       framework: path.resolve(__dirname, 'src/framework'),
       frameworkView: path.resolve(__dirname, 'src/framework/view'),
       const: path.resolve(__dirname, 'src/const.js'),
-      mock: path.resolve(__dirname, 'src/mock'),
     }
   }
 };
