@@ -10,7 +10,7 @@ import {
   LoadingView,
 } from 'view';
 
-import { RenderPosition, render, remove } from 'framework';
+import { RenderPosition, render, remove, UiBlocker } from 'framework';
 import { FilterType, SortType, UserAction, UpdateType } from 'const';
 import { FilmPresenter, FilterPresenter, PopupPresenter } from 'presenter';
 import { FilmModel } from 'model';
@@ -18,6 +18,11 @@ import { FilmModel } from 'model';
 const FILMS_STEP_LIMIT = 5;
 const RATING_COUNT = 2;
 const BUTTON_TAG_NAME = 'BUTTON';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 const ListDescription = {
   MAIN: 'Main',
@@ -52,6 +57,7 @@ export default class ContentPresenter {
   #currentSortType = SortType.DEFAULT;
   #renderedFilmsCount;
   #isLoading = true;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   get films() {
     this.#filterType = this.#filterModel.filter;
@@ -94,7 +100,7 @@ export default class ContentPresenter {
     render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
 
     this.#popupPresenter = new PopupPresenter(
-      this.#siteFooterElement, this.#bodyElement, this.#handleViewAction
+      this.#siteFooterElement, this.#bodyElement, this.#handleViewAction, this.#uiBlocker
     );
   };
 
@@ -271,29 +277,54 @@ export default class ContentPresenter {
     );
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update, presenter) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this.#filmModel.updateFilm(updateType, update);
+        this.#setFilmPresentersSaving(update.id);
+
+        if (this.#popupPresenter.isOpened()) {
+          this.#popupPresenter.setFilmInfoSaving();
+        }
+
+        try {
+          await this.#filmModel.updateFilm(updateType, update);
+        } catch(err) {
+          presenter.setFilmInfoAborting(this.#resetControlsState(update.id));
+        }
+
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
+
+  #resetControlsState = (filmId) => (
+    () => {
+      this.#getFilmPresenters(filmId).forEach((filmPresenter) => {
+        filmPresenter.filmComponent.updateElement({
+          isDisabled: false,
+        });
+      });
+
+      if (this.#popupPresenter.isOpened()) {
+        this.#popupPresenter.popupTopContainerComponent.updateElement({
+          isDisabled: false,
+        });
+      }
+    }
+  );
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.MINOR:
-        if (this.#popupPresenter.isOpened()) {
-          this.#popupPresenter.refreshPopupTopContainer();
-        }
-
+        this.#updatePopupTopContainer(data);
         this.#handleRatingFilmChange(data);
         this.#refreshMainList({resetRenderedFilmsCount: false});
         break;
       case UpdateType.SUPERMINOR:
-        if (this.#popupPresenter.isOpened()) {
-          this.#popupPresenter.refreshPopupTopContainer();
-        }
-
+        this.#updatePopupTopContainer(data);
         this.#handleRatingFilmChange(data);
         this.#clearRank();
         this.#renderRank();
@@ -310,6 +341,13 @@ export default class ContentPresenter {
     }
   };
 
+  #updatePopupTopContainer = (film) => {
+    if (this.#popupPresenter.isOpened()) {
+      this.#popupPresenter.film = film;
+      this.#popupPresenter.refreshPopupTopContainer();
+    }
+  };
+
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
       return;
@@ -321,13 +359,19 @@ export default class ContentPresenter {
   };
 
   #handleRatingFilmChange = (updatedFilm) => {
-    const filmPresenters = Array.from(this.#filmPresenter.keys())
-      .filter((listType) => listType !== ListDescription.MAIN)
-      .map((listType) => this.#filmPresenter.get(listType).get(updatedFilm.id))
-      .filter((presenter) => presenter);
-
-    filmPresenters.forEach((presenter) => presenter.init(updatedFilm));
+    this.#getFilmPresenters(updatedFilm.id, true).forEach((presenter) => presenter.init(updatedFilm));
   };
+
+  #setFilmPresentersSaving = (filmId) => {
+    this.#getFilmPresenters(filmId).forEach((presenter) => presenter.setSaving());
+  };
+
+  #getFilmPresenters = (filmId, shouldGetRating = false) => (
+    Array.from(this.#filmPresenter.keys())
+      .filter((listType) => !shouldGetRating || listType !== ListDescription.MAIN)
+      .map((listType) => this.#filmPresenter.get(listType).get(filmId))
+      .filter((presenter) => presenter)
+  );
 
   #handleShowMoreButtonClick = () => {
     this.#filmsListComponent.element.remove();

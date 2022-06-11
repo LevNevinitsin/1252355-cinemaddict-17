@@ -1,4 +1,4 @@
-import { AbstractView } from 'frameworkView';
+import { AbstractStatefulView } from 'frameworkView';
 import { formatRating, formatDate, getHumanizedDuration } from 'utils';
 import { CallbackName } from 'const';
 import cn from 'classnames';
@@ -16,7 +16,7 @@ const createGenresTemplate = (genres) => (
   genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('')
 );
 
-const createPopupTopContainerTemplate = (film) => {
+const createPopupTopContainerTemplate = (film, { isDisabled }) => {
   const {
     title,
     alternativeTitle,
@@ -120,31 +120,41 @@ const createPopupTopContainerTemplate = (film) => {
       </div>
 
       <section class="film-details__controls">
-        <button type="button" class="${watchlistClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="${alreadyWatchedClassName}" id="watched" name="watched">Already watched</button>
-        <button type="button" class="${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="${watchlistClassName}" id="watchlist" name="watchlist" ${isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+        <button type="button" class="${alreadyWatchedClassName}" id="watched" name="watched" ${isDisabled ? 'disabled' : ''}>Already watched</button>
+        <button type="button" class="${favoriteClassName}" id="favorite" name="favorite" ${isDisabled ? 'disabled' : ''}>Add to favorites</button>
       </section>
     </div>`
   );
 };
 
-export default class PopupTopContainerView extends AbstractView {
+export default class PopupTopContainerView extends AbstractStatefulView {
   #film;
+  #callbacksMap;
 
   constructor(film) {
     super();
-    this.#film = film;
+
+    this.#film = {
+      ...film,
+      userDetails: {...film.userDetails},
+    };
+
+    this._state = {
+      isDisabled: false,
+    };
   }
 
   get template() {
-    return createPopupTopContainerTemplate(this.#film);
+    return createPopupTopContainerTemplate(this.#film, this._state);
   }
 
   setHandlers = (callbacksMap) => {
-    this.#setCloseClickHandler(callbacksMap[CallbackName.CLOSE_CLICK]);
-    this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
-    this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
-    this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
+    this.#callbacksMap = callbacksMap;
+    this.#setCloseClickHandler(this.#callbacksMap[CallbackName.CLOSE_CLICK]);
+    this.#setWatchlistClickHandler(this.#callbacksMap[CallbackName.WATCHLIST_CLICK]);
+    this.#setWatchedClickHandler(this.#callbacksMap[CallbackName.WATCHED_CLICK]);
+    this.#setFavoriteClickHandler(this.#callbacksMap[CallbackName.FAVORITE_CLICK]);
   };
 
   removeHandlers = () => {
@@ -159,6 +169,10 @@ export default class PopupTopContainerView extends AbstractView {
 
     this.element.querySelector(`.${buttonFavoriteClass}`)
       .removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.setHandlers(this.#callbacksMap);
   };
 
   #setCloseClickHandler = (callback) => {
