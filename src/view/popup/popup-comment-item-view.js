@@ -1,11 +1,16 @@
 import he from 'he';
-import { AbstractView } from 'frameworkView';
+import { AbstractStatefulView } from 'frameworkView';
 import { getRelativeTime } from 'utils';
 import { UserAction, UpdateType } from 'const';
 
 const DELETE_BUTTON_SELECTOR = '.film-details__comment-delete';
 
-const createPopupCommentItemTemplate = (comment) => {
+const DeleteButtonText = {
+  DELETE: 'Delete',
+  DELETING: 'Deleting...',
+};
+
+const createPopupCommentItemTemplate = (comment, { isDisabled }) => {
   const {
     author,
     comment: commentText,
@@ -14,6 +19,7 @@ const createPopupCommentItemTemplate = (comment) => {
   } = comment;
 
   const relativeTime = getRelativeTime(date);
+  const deleteButtonText = isDisabled ? DeleteButtonText.DELETING : DeleteButtonText.DELETE;
 
   return (
     `<li class="film-details__comment">
@@ -25,23 +31,27 @@ const createPopupCommentItemTemplate = (comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${relativeTime}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" ${isDisabled ? 'disabled' : ''}>${deleteButtonText}</button>
         </p>
       </div>
     </li>`
   );
 };
 
-export default class PopupCommentItemView extends AbstractView {
+export default class PopupCommentItemView extends AbstractStatefulView {
   #comment;
 
   constructor(comment) {
     super();
     this.#comment = comment;
+
+    this._state = {
+      isDisabled: false,
+    };
   }
 
   get template() {
-    return createPopupCommentItemTemplate(this.#comment);
+    return createPopupCommentItemTemplate(this.#comment, this._state);
   }
 
   setDeleteClickHandler = (callback) => {
@@ -50,6 +60,10 @@ export default class PopupCommentItemView extends AbstractView {
     this.element
       .querySelector(DELETE_BUTTON_SELECTOR)
       .addEventListener('click', this.#deleteClickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #deleteClickHandler = (evt) => {

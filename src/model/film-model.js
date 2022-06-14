@@ -28,8 +28,7 @@ export default class FilmModel extends Observable {
 
   init = async () => {
     try {
-      const films = await this.#filmsApiService.films;
-      this.#films = films.map(this.#adaptToClient);
+      this.#films = await this.#filmsApiService.films;
     } catch(err) {
       this.#films = [];
     }
@@ -49,56 +48,11 @@ export default class FilmModel extends Observable {
     }
 
     try {
-      const response = await this.#filmsApiService.updateFilm(update);
-      const updatedFilm = this.#adaptToClient(response);
+      const updatedFilm = await this.#filmsApiService.updateFilm(update);
       this.#films.splice(index, UPDATE_COUNT, updatedFilm);
-      this._notify(updateType, update);
+      this._notify(updateType, updatedFilm);
     } catch(err) {
       throw new Error('Can\'t update film');
     }
-  };
-
-  #adaptToClient = (film) => {
-    const filmInfo = film.film_info;
-    const userDetails = film.user_details;
-
-    const adaptedFilmInfo = {
-      ...filmInfo,
-      alternativeTitle: filmInfo.alternative_title,
-      totalRating: filmInfo.total_rating,
-      ageRating: filmInfo.age_rating,
-
-      release: {
-        ...filmInfo.release,
-        releaseCountry: filmInfo.release.release_country
-      }
-    };
-
-    delete adaptedFilmInfo.alternative_title;
-    delete adaptedFilmInfo.total_rating;
-    delete adaptedFilmInfo.age_rating;
-    delete adaptedFilmInfo.release.release_country;
-
-    const adaptedUserDetails = {
-      ...userDetails,
-      alreadyWatched: userDetails.already_watched,
-      watchingDate: userDetails.watching_date,
-    };
-
-    delete adaptedUserDetails.already_watched;
-    delete adaptedUserDetails.watching_date;
-
-    const adaptedFilm = {
-      ...film,
-      commentsIds: film.comments,
-      filmInfo: adaptedFilmInfo,
-      userDetails: adaptedUserDetails,
-    };
-
-    delete adaptedFilm.comments;
-    delete adaptedFilm.film_info;
-    delete adaptedFilm.user_details;
-
-    return adaptedFilm;
   };
 }

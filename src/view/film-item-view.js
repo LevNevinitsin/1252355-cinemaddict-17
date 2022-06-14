@@ -1,4 +1,4 @@
-import { AbstractView } from 'frameworkView';
+import { AbstractStatefulView } from 'frameworkView';
 import { formatRating, getYear, getHumanizedDuration, truncate, pluralize } from 'utils';
 import { CallbackName } from 'const';
 import cn from 'classnames';
@@ -12,7 +12,7 @@ const buttonWatchedClass = `${BUTTON_BASE_CLASS}--mark-as-watched`;
 const buttonFavoriteClass = `${BUTTON_BASE_CLASS}--favorite`;
 const buttonActiveClass = `${BUTTON_BASE_CLASS}--active`;
 
-const createFilmItemTemplate = (film) => {
+const createFilmItemTemplate = (film, { isDisabled }) => {
   const commentsCount = film.commentsIds.length;
 
   const {
@@ -65,30 +65,40 @@ const createFilmItemTemplate = (film) => {
         <span class="film-card__comments">${commentsInfo}</span>
       </a>
       <div class="film-card__controls">
-        <button class="${watchlistClassName}" type="button">Add to watchlist</button>
-        <button class="${alreadyWatchedClassName}" type="button">Mark as watched</button>
-        <button class="${favoriteClassName}" type="button">Mark as favorite</button>
+        <button class="${watchlistClassName}" type="button" ${isDisabled ? 'disabled' : ''}>Add to watchlist</button>
+        <button class="${alreadyWatchedClassName}" type="button" ${isDisabled ? 'disabled' : ''}>Mark as watched</button>
+        <button class="${favoriteClassName}" type="button" ${isDisabled ? 'disabled' : ''}>Mark as favorite</button>
       </div>
     </article>`
   );
 };
 
-export default class FilmItemView extends AbstractView {
+export default class FilmItemView extends AbstractStatefulView {
   #film;
+  #callbacksMap;
 
   constructor(film) {
     super();
-    this.#film = film;
+
+    this.#film = {
+      ...film,
+      userDetails: {...film.userDetails},
+    };
+
+    this._state = {
+      isDisabled: false,
+    };
   }
 
   get template() {
-    return createFilmItemTemplate(this.#film);
+    return createFilmItemTemplate(this.#film, this._state);
   }
 
   setHandlers = (callbacksMap) => {
-    this.#setWatchlistClickHandler(callbacksMap[CallbackName.WATCHLIST_CLICK]);
-    this.#setWatchedClickHandler(callbacksMap[CallbackName.WATCHED_CLICK]);
-    this.#setFavoriteClickHandler(callbacksMap[CallbackName.FAVORITE_CLICK]);
+    this.#callbacksMap = callbacksMap;
+    this.#setWatchlistClickHandler(this.#callbacksMap[CallbackName.WATCHLIST_CLICK]);
+    this.#setWatchedClickHandler(this.#callbacksMap[CallbackName.WATCHED_CLICK]);
+    this.#setFavoriteClickHandler(this.#callbacksMap[CallbackName.FAVORITE_CLICK]);
   };
 
   removeHandlers = () => {
@@ -107,6 +117,11 @@ export default class FilmItemView extends AbstractView {
   setClickHandler = (callback) => {
     this._callback.click = callback;
     this.element.addEventListener('click', this.#clickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.setHandlers(this.#callbacksMap);
+    this.setClickHandler(this._callback.click);
   };
 
   #setWatchlistClickHandler = (callback) => {

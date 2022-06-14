@@ -16,6 +16,7 @@ import {
 } from 'popup';
 
 const BODY_HIDE_OVERFLOW_CLASS = 'hide-overflow';
+const CONTROLS_SELECTOR = '.film-details__controls';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -42,11 +43,13 @@ export default class PopupPresenter {
   #mode = Mode.DEFAULT;
   #commentComponent = new Map();
   #isLoading = true;
+  #uiBlocker = null;
 
-  constructor(container, bodyElement, changeData) {
+  constructor(container, bodyElement, changeData, uiBlocker) {
     this.#container = container;
     this.#bodyElement = bodyElement;
     this.#changeData = changeData;
+    this.#uiBlocker = uiBlocker;
     this.#commentModel = new CommentModel(new CommentsApiService(END_POINT, AUTHORIZATION));
     this.#commentModel.addObserver(this.#handleModelEvent);
 
@@ -57,6 +60,18 @@ export default class PopupPresenter {
       [CallbackName.FAVORITE_CLICK]: this.#handleFavoriteClick,
       [CallbackName.CLOSE_CLICK]: this.#closePopup,
     };
+  }
+
+  get popupTopContainerComponent() {
+    return this.#popupTopContainerComponent;
+  }
+
+  get film() {
+    return this.#film;
+  }
+
+  set film(film) {
+    this.#film = film;
   }
 
   get filmId() {
@@ -86,20 +101,82 @@ export default class PopupPresenter {
 
   isOpened = () => this.#mode === Mode.OPENED;
 
+  setFilmInfoSaving = () => {
+    this.#popupTopContainerComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
   refreshPopupTopContainer = () => {
     this.#clearPopupTopContainer();
     this.#renderPopupTopContainer();
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #setCommentDeleting = (commentId) => {
+    this.#commentComponent.get(commentId).updateElement({
+      isDisabled: true,
+    });
+  };
+
+  #setCommentPosting = () => {
+    this.#popupNewCommentComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setFilmInfoAborting = (callback) => {
+    this.#popupTopContainerComponent.shake(callback, CONTROLS_SELECTOR);
+  };
+
+  #setDeleteCommentAborting = (commentId) => {
+    this.#commentComponent.get(commentId).shake(this.#resetCommentState(commentId));
+  };
+
+  #resetCommentState = (commentId) => (
+    () => {
+      this.#commentComponent.get(commentId).updateElement({
+        isDisabled: false,
+      });
+    }
+  );
+
+  #setAddCommentAborting = () => {
+    this.#popupNewCommentComponent.shake(this.#resetFormState);
+  };
+
+  #resetFormState = () => {
+    this.#popupNewCommentComponent.updateElement({
+      isDisabled: false,
+    });
+  };
+
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
-      case UserAction.ADD_COMMENT:
-        this.#commentModel.addComment(updateType, update);
-        break;
       case UserAction.DELETE_COMMENT:
-        this.#commentModel.deleteComment(updateType, update);
+        this.#setCommentDeleting(update.id);
+
+        try {
+          await this.#commentModel.deleteComment(updateType, update);
+        } catch(err) {
+          this.#setDeleteCommentAborting(update.id);
+        }
+
+        break;
+      case UserAction.ADD_COMMENT:
+        this.#setCommentPosting(update.id);
+
+        try {
+          await this.#commentModel.addComment(updateType, update, this.filmId);
+        } catch(err) {
+          this.#setAddCommentAborting();
+        }
+
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType) => {
@@ -221,17 +298,41 @@ export default class PopupPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#film.userDetails.watchlist = !this.#film.userDetails.watchlist;
-    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, this.#film);
+    const updatedFilm = {
+      ...this.#film,
+
+      userDetails: {
+        ...this.#film.userDetails,
+        watchlist: !this.#film.userDetails.watchlist,
+      },
+    };
+
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, updatedFilm, this);
   };
 
   #handleWatchedClick = () => {
-    this.#film.userDetails.alreadyWatched = !this.#film.userDetails.alreadyWatched;
-    this.#changeData(UserAction.UPDATE_FILM, UpdateType.SUPERMINOR, this.#film);
+    const updatedFilm = {
+      ...this.#film,
+
+      userDetails: {
+        ...this.#film.userDetails,
+        alreadyWatched: !this.#film.userDetails.alreadyWatched,
+      },
+    };
+
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.SUPERMINOR, updatedFilm, this);
   };
 
   #handleFavoriteClick = () => {
-    this.#film.userDetails.favorite = !this.#film.userDetails.favorite;
-    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, this.#film);
+    const updatedFilm = {
+      ...this.#film,
+
+      userDetails: {
+        ...this.#film.userDetails,
+        favorite: !this.#film.userDetails.favorite,
+      },
+    };
+
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, updatedFilm, this);
   };
 }

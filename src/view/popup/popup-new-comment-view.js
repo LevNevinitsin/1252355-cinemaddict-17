@@ -24,12 +24,12 @@ const createChosenEmotionTemplate = (chosenEmotion) => {
   );
 };
 
-const createEmojiItems = (chosenEmotion) => (
+const createEmojiItems = (chosenEmotion, isDisabled) => (
   emotions.map((emotion) => {
     const checked = chosenEmotion === emotion ? 'checked' : '';
 
     return (
-      `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${checked}>
+      `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${checked} ${isDisabled ? 'disabled' : ''}>
       <label class="film-details__emoji-label" for="emoji-${emotion}">
         <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
       </label>`
@@ -37,22 +37,24 @@ const createEmojiItems = (chosenEmotion) => (
   }).join('')
 );
 
-const createPopupNewCommentTemplate = ({emotion, comment}) => (
+const createPopupNewCommentTemplate = ({emotion, comment, isDisabled}) => (
   `<div class="film-details__new-comment">
     ${createChosenEmotionTemplate(emotion)}
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}>${comment}</textarea>
     </label>
 
     <div class="film-details__emoji-list">
-      ${createEmojiItems(emotion)}
+      ${createEmojiItems(emotion, isDisabled)}
     </div>
   </div>`
 );
 
 
 export default class PopupNewCommentView extends AbstractStatefulView {
+  #callbacksMap;
+
   constructor (comment = BLANK_COMMENT) {
     super();
     this._state = PopupNewCommentView.parseCommentToState(comment);
@@ -64,7 +66,8 @@ export default class PopupNewCommentView extends AbstractStatefulView {
   }
 
   setHandlers = (callbacksMap) => {
-    this.#setCtrlEnterKeydownHandler(callbacksMap[CallbackName.CTRL_ENTER_KEYDOWN]);
+    this.#callbacksMap = callbacksMap;
+    this.#setCtrlEnterKeydownHandler(this.#callbacksMap[CallbackName.CTRL_ENTER_KEYDOWN]);
   };
 
   removeHandlers = () => {
@@ -78,6 +81,7 @@ export default class PopupNewCommentView extends AbstractStatefulView {
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.setHandlers(this.#callbacksMap);
   };
 
   #textInputHandler = (evt) => {
@@ -114,6 +118,15 @@ export default class PopupNewCommentView extends AbstractStatefulView {
     }
   };
 
-  static parseCommentToState = (comment) => ({...comment});
-  static parseStateToComment = (state) => ({...state});
+  static parseCommentToState = (comment) => ({
+    ...comment,
+    isDisabled: false,
+  });
+
+  static parseStateToComment = (state) => {
+    const comment = {...state};
+    delete comment.isDisabled;
+
+    return comment;
+  };
 }
