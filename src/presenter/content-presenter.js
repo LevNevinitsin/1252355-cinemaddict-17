@@ -258,14 +258,9 @@ export default class ContentPresenter {
     this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
   };
 
-  #clearRatingLists = () => {
-    this.#clearRatingList(ListDescription.TOP_RATED);
+  #refreshMostCommentedList = () => {
     this.#clearRatingList(ListDescription.MOST_COMMENTED);
-  };
-
-  #refreshRatingLists = () => {
-    this.#clearRatingLists();
-    this.#renderRatingLists();
+    this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
   };
 
   #renderFilmsList = (films, filmsCount, listTitle = null) => {
@@ -364,20 +359,21 @@ export default class ContentPresenter {
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
+      case UpdateType.SUPERPATCH:
+        this.#handleFilmChange(data, [ListDescription.MAIN, ListDescription.TOP_RATED]);
+        this.#refreshMostCommentedList();
+        break;
       case UpdateType.MINOR:
         this.#updatePopupTopContainer(data);
-        this.#handleRatingFilmChange(data);
+        this.#handleFilmChange(data, [ListDescription.TOP_RATED, ListDescription.MOST_COMMENTED]);
         this.#refreshMainList({resetRenderedFilmsCount: false});
         break;
       case UpdateType.SUPERMINOR:
         this.#updatePopupTopContainer(data);
-        this.#handleRatingFilmChange(data);
+        this.#handleFilmChange(data, [ListDescription.TOP_RATED, ListDescription.MOST_COMMENTED]);
         this.#clearRank();
         this.#renderRank();
         this.#refreshMainList({resetRenderedFilmsCount: false});
-        break;
-      case UpdateType.HYPERMINOR:
-        this.#refreshLists();
         break;
       case UpdateType.MAJOR:
         this.#refreshMainList({resetSortType: true});
@@ -388,11 +384,6 @@ export default class ContentPresenter {
         this.#renderContent();
         break;
     }
-  };
-
-  #refreshLists = () => {
-    this.#refreshMainList({resetRenderedFilmsCount: false});
-    this.#refreshRatingLists();
   };
 
   #updatePopupTopContainer = (film) => {
@@ -412,8 +403,8 @@ export default class ContentPresenter {
     this.#renderMainList();
   };
 
-  #handleRatingFilmChange = (updatedFilm) => {
-    this.#getFilmPresenters(updatedFilm.id, true).forEach((presenter) => {
+  #handleFilmChange = (updatedFilm, listTypes = Object.keys(ListDescription)) => {
+    this.#getFilmPresenters(updatedFilm.id, listTypes).forEach((presenter) => {
       presenter.init(updatedFilm);
       presenter.filmComponent.setClickHandler(this.#handleFilmCardClick(updatedFilm));
     });
@@ -423,9 +414,9 @@ export default class ContentPresenter {
     this.#getFilmPresenters(filmId).forEach((presenter) => presenter.setSaving());
   };
 
-  #getFilmPresenters = (filmId, shouldGetRating = false) => (
+  #getFilmPresenters = (filmId, listTypes = Object.keys(ListDescription)) => (
     Array.from(this.#filmPresenter.keys())
-      .filter((listType) => !shouldGetRating || listType !== ListDescription.MAIN)
+      .filter((listType) => listTypes.includes(listType))
       .map((listType) => this.#filmPresenter.get(listType).get(filmId))
       .filter((presenter) => presenter)
   );

@@ -58,8 +58,9 @@ export default class FilmModel extends Observable {
   };
 
   setFilmCommentsIds = (filmId, commentsIds) => {
-    this.getFilm(filmId).commentsIds = commentsIds;
-    this._notify(UpdateType.HYPERMINOR);
+    const film = this.getFilm(filmId);
+    film.commentsIds = commentsIds;
+    this._notify(UpdateType.SUPERPATCH, film);
   };
 
   hasSomeRating = () => this.films.some((film) => film.filmInfo.totalRating !== 0);
