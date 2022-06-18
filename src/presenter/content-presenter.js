@@ -107,7 +107,6 @@ export default class ContentPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
 
     this.#renderContent();
-    render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
 
     this.#popupPresenter = new PopupPresenter(
       this.#siteFooterElement,
@@ -122,8 +121,12 @@ export default class ContentPresenter {
     this.#renderRank();
     this.#renderMainList();
 
-    if (this.#filmModel.films.length && !this.#isLoading) {
-      this.#renderRatingLists();
+    if (!this.#isLoading) {
+      if (this.#filmModel.films.length) {
+        this.#renderRatingLists();
+      }
+
+      render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
