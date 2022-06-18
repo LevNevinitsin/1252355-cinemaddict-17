@@ -68,6 +68,7 @@ export default class ContentPresenter {
   #renderedFilmsCount;
   #isLoading = true;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
+  #ratingListsCheckersMap = null;
 
   get films() {
     this.#filterType = this.#filterModel.filter;
@@ -115,6 +116,17 @@ export default class ContentPresenter {
       this.#uiBlocker,
       this.#filmModel,
     );
+
+    this.#ratingListsCheckersMap = {
+      [ListDescription.TOP_RATED]: {
+        'doesInfoExist': this.#filmModel.hasSomeRating,
+        'areValuesEqual': this.#filmModel.areAllRatingsEqual,
+      },
+      [ListDescription.MOST_COMMENTED]: {
+        'doesInfoExist': this.#filmModel.hasSomeCommentsCount,
+        'areValuesEqual': this.#filmModel.areAllCommentsCountsEqual,
+      },
+    };
   };
 
   #renderContent = () => {
@@ -292,7 +304,15 @@ export default class ContentPresenter {
   };
 
   #renderRatingList = (listType, sortType) => {
-    this.ratingFilms = FilmModel.sortFilms(this.#filmModel.films, sortType).slice(0, RATING_COUNT);
+    const checkersMap = this.#ratingListsCheckersMap[listType];
+
+    if (!checkersMap.doesInfoExist()) {
+      return;
+    }
+
+    this.ratingFilms = !checkersMap.areValuesEqual()
+      ? FilmModel.sortFilms(this.#filmModel.films, sortType).slice(0, RATING_COUNT)
+      : this.#filmModel.getRandomFilms(RATING_COUNT);
 
     this.#renderFilmsList(
       this.ratingFilms, RATING_COUNT, listType

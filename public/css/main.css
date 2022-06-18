@@ -401,7 +401,7 @@ button {
   position: relative;
 }
 
-.films-list--extra:last-of-type::before {
+.films-list--extra:nth-of-type(3)::before {
   border-left: solid 1px var(--outline-color);
   bottom: 20px;
   content: '';

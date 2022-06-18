@@ -1,5 +1,6 @@
 import { Observable } from 'framework';
 import { SortType, UpdateType } from 'const';
+import { getUniqueRandomArrayElements } from 'utils';
 import dayjs from 'dayjs';
 
 const UPDATE_COUNT = 1;
@@ -60,4 +61,18 @@ export default class FilmModel extends Observable {
     this.getFilm(filmId).commentsIds = commentsIds;
     this._notify(UpdateType.HYPERMINOR);
   };
+
+  hasSomeRating = () => this.films.some((film) => film.filmInfo.totalRating !== 0);
+
+  hasSomeCommentsCount = () => this.films.some((film) => film.commentsIds.length > 0);
+
+  areAllRatingsEqual = () => this.films.every(
+    (film) => film.filmInfo.totalRating === this.films[0].filmInfo.totalRating
+  );
+
+  areAllCommentsCountsEqual = () => this.films.every(
+    (film) => film.commentsIds.length === this.films[0].commentsIds.length
+  );
+
+  getRandomFilms = (count) => getUniqueRandomArrayElements(this.films, count);
 }
