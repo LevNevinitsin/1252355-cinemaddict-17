@@ -42,7 +42,17 @@ export default class ContentPresenter {
 
   #userRankComponent;
   #sortComponent;
+
   #filmsListComponent = new FilmListView();
+  #filmsListTopRatedComponent = new FilmListView(ListDescription.TOP_RATED);
+  #filmsListMostCommentedComponent = new FilmListView(ListDescription.MOST_COMMENTED);
+
+  #filmsListsComponentsMap = {
+    [ListDescription.MAIN]: this.#filmsListComponent,
+    [ListDescription.TOP_RATED]: this.#filmsListTopRatedComponent,
+    [ListDescription.MOST_COMMENTED]: this.#filmsListMostCommentedComponent,
+  };
+
   #filmsContainerComponent;
   #noFilmsComponent;
   #showMoreButtonComponent;
@@ -100,7 +110,11 @@ export default class ContentPresenter {
     render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
 
     this.#popupPresenter = new PopupPresenter(
-      this.#siteFooterElement, this.#bodyElement, this.#handleViewAction, this.#uiBlocker
+      this.#siteFooterElement,
+      this.#bodyElement,
+      this.#handleViewAction,
+      this.#uiBlocker,
+      this.#filmModel,
     );
   };
 
@@ -109,8 +123,7 @@ export default class ContentPresenter {
     this.#renderMainList();
 
     if (this.#filmModel.films.length && !this.#isLoading) {
-      this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
-      this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
+      this.#renderRatingLists();
     }
 
     render(this.#mainContentComponent, this.#siteMainElement);
@@ -225,8 +238,24 @@ export default class ContentPresenter {
     this.#renderMainList(resetRenderedFilmsCount);
   };
 
+  #renderRatingLists = () => {
+    this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
+    this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
+  };
+
+  #clearRatingLists = () => {
+    this.#clearRatingList(ListDescription.TOP_RATED);
+    this.#clearRatingList(ListDescription.MOST_COMMENTED);
+  };
+
+  #refreshRatingLists = () => {
+    this.#clearRatingLists();
+    this.#renderRatingLists();
+  };
+
   #renderFilmsList = (films, filmsCount, listTitle = null) => {
-    const filmsListComponent = !listTitle ? this.#filmsListComponent : new FilmListView(listTitle);
+    const listType = listTitle ?? ListDescription.MAIN;
+    const filmsListComponent = this.#filmsListsComponentsMap[listType];
     const renderPosition = !listTitle ? RenderPosition.AFTERBEGIN : RenderPosition.BEFOREEND;
     const filmsContainerComponent = new FilmsContainerView();
     filmsCount = Math.min(films.length, filmsCount);
@@ -236,7 +265,6 @@ export default class ContentPresenter {
       this.#renderedFilmsCount = filmsCount;
     }
 
-    const listType = listTitle ?? ListDescription.MAIN;
     this.#filmPresenter.set(listType, new Map());
 
     for (let i = 0; i < filmsCount; i++) {
@@ -275,6 +303,10 @@ export default class ContentPresenter {
     this.#renderFilmsList(
       this.ratingFilms, RATING_COUNT, listType
     );
+  };
+
+  #clearRatingList = (listType) => {
+    remove(this.#filmsListsComponentsMap[listType]);
   };
 
   #handleViewAction = async (actionType, updateType, update, presenter) => {
@@ -330,6 +362,9 @@ export default class ContentPresenter {
         this.#renderRank();
         this.#refreshMainList({resetRenderedFilmsCount: false});
         break;
+      case UpdateType.HYPERMINOR:
+        this.#refreshLists();
+        break;
       case UpdateType.MAJOR:
         this.#refreshMainList({resetSortType: true});
         break;
@@ -339,6 +374,11 @@ export default class ContentPresenter {
         this.#renderContent();
         break;
     }
+  };
+
+  #refreshLists = () => {
+    this.#refreshMainList({resetRenderedFilmsCount: false});
+    this.#refreshRatingLists();
   };
 
   #updatePopupTopContainer = (film) => {

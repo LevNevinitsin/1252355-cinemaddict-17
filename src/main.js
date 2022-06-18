@@ -1,7 +1,7 @@
 import { ContentPresenter } from 'presenter';
 import { FilmModel, FilterModel } from 'model';
 import { AUTHORIZATION, END_POINT } from 'const';
-import FilmsApiService from './films-api-service.js';
+import { FilmsApiService } from 'api';
 
 const bodyElement = document.querySelector('body');
 const siteHeaderElement = bodyElement.querySelector('.header');

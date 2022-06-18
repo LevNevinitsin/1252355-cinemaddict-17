@@ -113,7 +113,7 @@ export default class PopupNewCommentView extends AbstractStatefulView {
       evt.preventDefault();
 
       if (this._state.comment && this._state.emotion) {
-        this._callback.ctrlEnterKeydown(UserAction.ADD_COMMENT, UpdateType.MAJOR, this._state);
+        this._callback.ctrlEnterKeydown(UserAction.ADD_COMMENT, UpdateType.POPUP_MAJOR, this._state);
       }
     }
   };

@@ -30,9 +30,13 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
+  POPUP_MINOR: 'POPUP_MINOR',
   SUPERMINOR: 'SUPERMINOR',
+  HYPERMINOR: 'HYPERMINOR',
   MAJOR: 'MAJOR',
+  POPUP_MAJOR: 'POPUP_MAJOR',
   INIT: 'INIT',
+  POPUP_INIT: 'POPUP_INIT',
 };
 
 const AUTHORIZATION = 'Basic jf758urifhj';

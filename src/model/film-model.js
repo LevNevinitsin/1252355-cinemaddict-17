@@ -55,4 +55,9 @@ export default class FilmModel extends Observable {
       throw new Error('Can\'t update film');
     }
   };
+
+  setFilmCommentsIds = (filmId, commentsIds) => {
+    this.getFilm(filmId).commentsIds = commentsIds;
+    this._notify(UpdateType.HYPERMINOR);
+  };
 }
