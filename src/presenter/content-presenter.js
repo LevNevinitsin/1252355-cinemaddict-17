@@ -279,16 +279,7 @@ export default class ContentPresenter {
     const filmPresenter = new FilmPresenter(container, this.#handleViewAction);
     filmPresenter.init(film);
     this.#filmPresenter.get(listType).set(film.id, filmPresenter);
-
-    filmPresenter.filmComponent.setClickHandler((evt) => {
-      if (this.#popupPresenter.isOpened() && this.#popupPresenter.filmId === film.id) {
-        return;
-      }
-
-      if (evt.target.tagName !== BUTTON_TAG_NAME) {
-        this.#popupPresenter.init(film);
-      }
-    });
+    filmPresenter.filmComponent.setClickHandler(this.#handleFilmCardClick(film));
   };
 
   #renderShowMoreButton = () => {
@@ -399,7 +390,10 @@ export default class ContentPresenter {
   };
 
   #handleRatingFilmChange = (updatedFilm) => {
-    this.#getFilmPresenters(updatedFilm.id, true).forEach((presenter) => presenter.init(updatedFilm));
+    this.#getFilmPresenters(updatedFilm.id, true).forEach((presenter) => {
+      presenter.init(updatedFilm);
+      presenter.filmComponent.setClickHandler(this.#handleFilmCardClick(updatedFilm));
+    });
   };
 
   #setFilmPresentersSaving = (filmId) => {
@@ -411,6 +405,18 @@ export default class ContentPresenter {
       .filter((listType) => !shouldGetRating || listType !== ListDescription.MAIN)
       .map((listType) => this.#filmPresenter.get(listType).get(filmId))
       .filter((presenter) => presenter)
+  );
+
+  #handleFilmCardClick = (film) => (
+    (evt) => {
+      if (this.#popupPresenter.isOpened() && this.#popupPresenter.filmId === film.id) {
+        return;
+      }
+
+      if (evt.target.tagName !== BUTTON_TAG_NAME) {
+        this.#popupPresenter.init(film);
+      }
+    }
   );
 
   #handleShowMoreButtonClick = () => {
