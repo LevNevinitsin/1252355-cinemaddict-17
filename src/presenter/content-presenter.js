@@ -135,7 +135,6 @@ export default class ContentPresenter {
 
     if (!this.#isLoading) {
       this.#renderRatingLists();
-
       render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
     }
 
