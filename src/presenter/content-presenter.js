@@ -78,7 +78,7 @@ export default class ContentPresenter {
       return filteredFilms;
     }
 
-    return FilmModel.sortFilms(filteredFilms, this.#currentSortType);
+    return FilmModel.sortFilms(filteredFilms, this.#currentSortType, this.#filmModel);
   }
 
   init = (
@@ -300,13 +300,14 @@ export default class ContentPresenter {
 
   #renderRatingList = (listType, sortType) => {
     const checkersMap = this.#ratingListsCheckersMap[listType];
+    const sortedFilms = FilmModel.sortFilms(this.#filmModel.films, sortType, this.#filmModel);
 
     if (!checkersMap.doesInfoExist()) {
       return;
     }
 
     this.ratingFilms = !checkersMap.areValuesEqual()
-      ? FilmModel.sortFilms(this.#filmModel.films, sortType).slice(0, RATING_COUNT)
+      ? sortedFilms
       : this.#filmModel.getRandomFilms(RATING_COUNT);
 
     this.#renderFilmsList(

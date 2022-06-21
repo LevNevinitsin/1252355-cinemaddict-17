@@ -18,6 +18,11 @@ export default class FilmModel extends Observable {
   #filmsApiService = null;
   #films = [];
 
+  conditionsMap = {
+    [SortType.RATING_DESC]: {},
+    [SortType.COMMENTS_COUNT_DESC]: {},
+  };
+
   constructor(filmsApiService) {
     super();
     this.#filmsApiService = filmsApiService;
@@ -39,7 +44,26 @@ export default class FilmModel extends Observable {
 
   getFilm = (filmId) => this.#films.find((film) => film.id === filmId);
 
-  static sortFilms = (films, sortType) => [...films].sort(sortCallbacksMap[sortType]);
+  static sortFilms = (films, sortType, filmModel) => {
+    const sortedFilms = [...films].sort(sortCallbacksMap[sortType]);
+    const filmsCount = films.length;
+
+    if (sortType === SortType.RATING_DESC) {
+      filmModel.conditionsMap[sortType].areEqual = sortedFilms[0].filmInfo.totalRating
+        === sortedFilms[filmsCount - 1].filmInfo.totalRating;
+
+      filmModel.conditionsMap[sortType].hasValue = sortedFilms[0].filmInfo.totalRating !== 0;
+    }
+
+    if (sortType === SortType.COMMENTS_COUNT_DESC) {
+      filmModel.conditionsMap[sortType].areEqual = sortedFilms[0].commentsIds.length
+        === sortedFilms[filmsCount - 1].commentsIds.length;
+
+      filmModel.conditionsMap[sortType].hasValue = sortedFilms[0].commentsIds.length > 0;
+    }
+
+    return sortedFilms;
+  };
 
   updateFilm = async (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
@@ -63,17 +87,13 @@ export default class FilmModel extends Observable {
     this._notify(UpdateType.SUPERPATCH, film);
   };
 
-  hasSomeRating = () => this.films.some((film) => film.filmInfo.totalRating !== 0);
+  hasSomeRating = () => this.conditionsMap[SortType.RATING_DESC].hasValue;
 
-  hasSomeCommentsCount = () => this.films.some((film) => film.commentsIds.length > 0);
+  hasSomeCommentsCount = () => this.conditionsMap[SortType.COMMENTS_COUNT_DESC].hasValue;
 
-  areAllRatingsEqual = () => this.films.every(
-    (film) => film.filmInfo.totalRating === this.films[0].filmInfo.totalRating
-  );
+  areAllRatingsEqual = () => this.conditionsMap[SortType.RATING_DESC].areEqual;
 
-  areAllCommentsCountsEqual = () => this.films.every(
-    (film) => film.commentsIds.length === this.films[0].commentsIds.length
-  );
+  areAllCommentsCountsEqual = () => this.conditionsMap[SortType.COMMENTS_COUNT_DESC].areEqual;
 
   getRandomFilms = (count) => getUniqueRandomArrayElements(this.films, count);
 }
