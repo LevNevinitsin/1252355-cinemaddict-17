@@ -29,10 +29,14 @@ const UserAction = {
 
 const UpdateType = {
   PATCH: 'PATCH',
+  SUPERPATCH: 'SUPERPATCH',
   MINOR: 'MINOR',
+  POPUP_MINOR: 'POPUP_MINOR',
   SUPERMINOR: 'SUPERMINOR',
   MAJOR: 'MAJOR',
+  POPUP_MAJOR: 'POPUP_MAJOR',
   INIT: 'INIT',
+  POPUP_INIT: 'POPUP_INIT',
 };
 
 const AUTHORIZATION = 'Basic jf758urifhj';

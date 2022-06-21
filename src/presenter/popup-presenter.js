@@ -2,7 +2,7 @@ import { RenderPosition, render, replace, remove } from 'framework';
 import { CommentModel } from 'model';
 import { PopupView } from 'view';
 import { CallbackName, UserAction, UpdateType, AUTHORIZATION, END_POINT } from 'const';
-import CommentsApiService from '../comments-api-service.js';
+import { CommentsApiService } from 'api';
 
 import {
   PopupFormView,
@@ -44,12 +44,14 @@ export default class PopupPresenter {
   #commentComponent = new Map();
   #isLoading = true;
   #uiBlocker = null;
+  #filmModel = null;
 
-  constructor(container, bodyElement, changeData, uiBlocker) {
+  constructor(container, bodyElement, changeData, uiBlocker, filmModel) {
     this.#container = container;
     this.#bodyElement = bodyElement;
     this.#changeData = changeData;
     this.#uiBlocker = uiBlocker;
+    this.#filmModel = filmModel;
     this.#commentModel = new CommentModel(new CommentsApiService(END_POINT, AUTHORIZATION));
     this.#commentModel.addObserver(this.#handleModelEvent);
 
@@ -99,7 +101,9 @@ export default class PopupPresenter {
     remove(prevPopupComponent);
   };
 
-  isOpened = () => this.#mode === Mode.OPENED;
+  get isOpened () {
+    return this.#mode === Mode.OPENED;
+  }
 
   setFilmInfoSaving = () => {
     this.#popupTopContainerComponent.updateElement({
@@ -181,15 +185,17 @@ export default class PopupPresenter {
 
   #handleModelEvent = (updateType) => {
     switch (updateType) {
-      case UpdateType.MINOR:
+      case UpdateType.POPUP_MINOR:
         this.#refreshCommentsSection();
+        this.#filmModel.setFilmCommentsIds(this.#film.id, this.#commentModel.commentsIds);
         break;
-      case UpdateType.MAJOR:
+      case UpdateType.POPUP_MAJOR:
         this.#refreshCommentsSection();
         this.#clearNewCommentSection();
         this.#renderNewCommentSection();
+        this.#filmModel.setFilmCommentsIds(this.#film.id, this.#commentModel.commentsIds);
         break;
-      case  UpdateType.INIT:
+      case  UpdateType.POPUP_INIT:
         this.#isLoading = false;
         remove(this.#popupLoadingComponent);
         this.#renderCommentsSection();

@@ -17,6 +17,10 @@ export default class CommentModel extends Observable {
     return this.#comments;
   }
 
+  get commentsIds() {
+    return this.comments.map((comment) => comment.id);
+  }
+
   loadComments = async (filmId) => {
     this.#filmId = filmId;
 
@@ -26,7 +30,7 @@ export default class CommentModel extends Observable {
       this.#comments = [];
     }
 
-    this._notify(UpdateType.INIT);
+    this._notify(UpdateType.POPUP_INIT);
   };
 
   addComment = async (updateType, update, filmId) => {

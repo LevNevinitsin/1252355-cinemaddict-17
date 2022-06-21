@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
 import relativeTimePlugin from 'dayjs/plugin/relativeTime';
+import { random } from 'lodash';
 
 const formatRating = (rating, digitsCount = 1) => rating.toFixed(digitsCount);
 const getYear = (date) => dayjs(date).format('YYYY');
@@ -29,6 +30,23 @@ const pluralize = (count, noun, renderCount = true, suffix = 's') => {
 
 const split3 = (number) => number.toString().split(/(?=(?:...)*$)/).join(' ');
 
+const getUniqueRandomArrayElements = (array, count) => {
+  const arrayLength = array.length;
+
+  if (count > arrayLength) {
+    throw new Error('Count is too big');
+  }
+
+  const result = [];
+  const elements = [...array];
+
+  for (let i = 0; i < count; i++) {
+    result.push(elements.splice(random(arrayLength - 1), 1)[0]);
+  }
+
+  return result;
+};
+
 export {
   formatRating,
   getYear,
@@ -38,4 +56,5 @@ export {
   truncate,
   pluralize,
   split3,
+  getUniqueRandomArrayElements,
 };
