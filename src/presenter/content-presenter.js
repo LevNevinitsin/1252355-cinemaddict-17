@@ -263,14 +263,14 @@ export default class ContentPresenter {
     this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
   };
 
-  #renderFilmsList = (films, filmsCount, listTitle = null) => {
-    const listType = listTitle ?? ListDescription.MAIN;
+  #renderFilmsList = (films, filmsCount, listType = ListDescription.MAIN) => {
     const filmsListComponent = this.#filmsListsComponentsMap[listType];
-    const renderPosition = !listTitle ? RenderPosition.AFTERBEGIN : RenderPosition.BEFOREEND;
+    const isMainList = listType === ListDescription.MAIN;
+    const renderPosition = isMainList ? RenderPosition.AFTERBEGIN : RenderPosition.BEFOREEND;
     const filmsContainerComponent = new FilmsContainerView();
     filmsCount = Math.min(films.length, filmsCount);
 
-    if (!listTitle) {
+    if (isMainList) {
       this.#filmsContainerComponent = filmsContainerComponent;
       this.#renderedFilmsCount = filmsCount;
     }
