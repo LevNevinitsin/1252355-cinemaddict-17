@@ -101,7 +101,9 @@ export default class PopupPresenter {
     remove(prevPopupComponent);
   };
 
-  isOpened = () => this.#mode === Mode.OPENED;
+  get isOpened () {
+    return this.#mode === Mode.OPENED;
+  }
 
   setFilmInfoSaving = () => {
     this.#popupTopContainerComponent.updateElement({

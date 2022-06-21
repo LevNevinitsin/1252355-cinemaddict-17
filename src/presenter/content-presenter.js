@@ -326,7 +326,7 @@ export default class ContentPresenter {
       case UserAction.UPDATE_FILM:
         this.#setFilmPresentersSaving(update.id);
 
-        if (this.#popupPresenter.isOpened()) {
+        if (this.#popupPresenter.isOpened) {
           this.#popupPresenter.setFilmInfoSaving();
         }
 
@@ -350,7 +350,7 @@ export default class ContentPresenter {
         });
       });
 
-      if (this.#popupPresenter.isOpened()) {
+      if (this.#popupPresenter.isOpened) {
         this.#popupPresenter.popupTopContainerComponent.updateElement({
           isDisabled: false,
         });
@@ -388,7 +388,7 @@ export default class ContentPresenter {
   };
 
   #updatePopupTopContainer = (film) => {
-    if (this.#popupPresenter.isOpened()) {
+    if (this.#popupPresenter.isOpened) {
       this.#popupPresenter.film = film;
       this.#popupPresenter.refreshPopupTopContainer();
     }
@@ -424,7 +424,7 @@ export default class ContentPresenter {
 
   #handleFilmCardClick = (film) => (
     (evt) => {
-      if (this.#popupPresenter.isOpened() && this.#popupPresenter.filmId === film.id) {
+      if (this.#popupPresenter.isOpened && this.#popupPresenter.filmId === film.id) {
         return;
       }
 
