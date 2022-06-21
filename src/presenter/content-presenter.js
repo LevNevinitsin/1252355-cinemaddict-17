@@ -134,9 +134,7 @@ export default class ContentPresenter {
     this.#renderMainList();
 
     if (!this.#isLoading) {
-      if (this.#filmModel.films.length) {
-        this.#renderRatingLists();
-      }
+      this.#renderRatingLists();
 
       render(new FilmsCountView(this.#filmModel.films.length), this.#statisticsElement);
     }
@@ -254,8 +252,10 @@ export default class ContentPresenter {
   };
 
   #renderRatingLists = () => {
-    this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
-    this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
+    if (this.#filmModel.films.length) {
+      this.#renderRatingList(ListDescription.TOP_RATED, SortType.RATING_DESC);
+      this.#renderRatingList(ListDescription.MOST_COMMENTED, SortType.COMMENTS_COUNT_DESC);
+    }
   };
 
   #refreshMostCommentedList = () => {
