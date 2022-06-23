@@ -276,9 +276,9 @@ export default class ContentPresenter {
 
     this.#filmPresenter.set(listType, new Map());
 
-    for (let i = 0; i < filmsCount; i++) {
-      this.#renderFilm(films[i], filmsContainerComponent.element, listType);
-    }
+    films.slice(0, filmsCount).forEach((film) => {
+      this.#renderFilm(film, filmsContainerComponent.element, listType);
+    });
 
     render(filmsContainerComponent, filmsListComponent.element);
     render(filmsListComponent, this.#mainContentComponent.element, renderPosition);
